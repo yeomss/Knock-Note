@@ -1,55 +1,12 @@
 <template>
   <div id="app">
     <header-view></header-view>
+    <category-view></category-view>
+    <search-note @noteSearched="searchNote"></search-note>
+    <favorite-view :index="0" :notes="notess"></favorite-view>
 
-    <div>
-      <select class="category-filter" v-model="selected">
-        <option value="">전체</option>
-        <option v-for="list in categorys" :key="list">
-          {{ list }}
-        </option>
-      </select>
-      <button
-        class="category-edit"
-        @click="modalCategory()"
-        @click.prevent="categoryMain = true"
-      >
-        카테고리 수정
-      </button>
-
-      <div v-if="categorylist">
-        <div>
-          <div class="category-modal-content">
-            <div
-              v-for="(list, index) in categorys"
-              :key="`list-${index}`"
-              class="category"
-            >
-              {{ list }}
-              <span v-if="index > 1" @click.prevent="deleteCategory(index)">
-                <i class="fas fa-times"></i>
-              </span>
-            </div>
-            <categoryadd
-              :main="categoryMain"
-              @categoryAdd="addCategory"
-              @categoryDeleted="deleteCategory"
-              @categoryCancle="modalCategory"
-            ></categoryadd>
-          </div>
-
-          <div class="category-modal-layer"></div>
-        </div>
-      </div>
-    </div>
-
-    <div>
-      <SearchNote @noteSearched="searchNote"></SearchNote>
-    </div>
-
+    <!-- 즐겨찾기 부분 -->
     <table class="noteContainer">
-      <!--favorite note part-->
-      <!-- <div class="favorite-part">Favorites</div> -->
       <div class="note-favorite">
         <tr
           v-for="(note, index) in notesFilter(selected, search)"
@@ -58,13 +15,9 @@
           class="note"
           :style="{ 'background-color': note.theme }"
         >
+          <!-- 이부분이 컴포넌트화 될 것임 -->
           <div v-if="note.lock != true">
             <span class="favorites">
-              <!-- <i
-                class="far fa-star"
-                @click="addFavorite(index)"
-                v-if="!notes[index].favorite"
-              ></i> -->
               <i class="fas fa-star" @click="deleteFavorite(index)"></i>
             </span>
             <span class="delete" @click.prevent="deleteNote(index)">
@@ -573,9 +526,12 @@
 </template>
 
 <script>
+/* eslint-disable no-unused-vars */
 import HeaderView from "./views/HeaderView.vue";
+import CategoryView from "./views/CategoryView.vue";
+import FavoriteView from "./views/FavoriteView.vue";
 import NoteEditor from "./components/NoteEditor.vue";
-import NoteSearch from "./components/Search.vue";
+import SearchNote from "./components/SearchNote.vue";
 import categoryadd from "./components/CategoryAdd.vue";
 import * as tmImage from "@teachablemachine/image";
 import * as cocoSSD from "@tensorflow-models/coco-ssd";
@@ -589,8 +545,14 @@ let model;
 
 export default {
   name: "App",
+  created() {
+    localStorage.setItem("notess", JSON.stringify(this.$store.state.notes));
+    this.notess = JSON.parse(localStorage.getItem("notess"));
+    console.log("notess: ", this.notess);
+  },
   data: function () {
     return {
+      notess: null,
       editorOpen: false,
       selected: "",
       search: "",
@@ -915,17 +877,6 @@ export default {
       console.log(tf.version.cocoSSD);
     },
 
-    // 날씨
-    // getMap() {
-    //   if (navigator.geolocation) {
-    //     var self = this;
-    //     navigator.geolocation.getCurrentPosition(function (position) {
-    //       (self.lat = position.coords.latitude), // 위도
-    //         (self.lon = position.coords.longitude); // 경도
-    //     });
-    //   }
-    // },
-
     modalLock(index) {
       //console.log("modal: ", index);
       this.notes[index].lock_modal = !this.notes[index].lock_modal;
@@ -1030,9 +981,11 @@ export default {
 
   components: {
     HeaderView,
+    CategoryView,
+    FavoriteView,
     appNoteEditor: NoteEditor,
-    SearchNote: NoteSearch,
-    categoryadd: categoryadd,
+    SearchNote,
+    // categoryadd: categoryadd,
   },
 };
 </script>
