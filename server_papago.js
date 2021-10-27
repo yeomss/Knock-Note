@@ -1,16 +1,15 @@
 var express = require("express");
 var app = express();
 var cors = require("cors");
-//var fs = require("fs");
+var { apiKey } = require("./config/apiKey");
+var client_id = apiKey.papago.id;
+var client_secret = apiKey.papago.secret;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 
-var client_id = "tsTGKWRX_Nf9Wp_SYMyy";
-var client_secret = "y9FiZAMZk8";
-
-app.post("/translate", function(req, res) {
+app.post("/translate", function (req, res) {
   //const obj = JSON.parse(JSON.stringify(req.body));
   //console.log(obj);
   const obj = JSON.parse(JSON.stringify(req.body));
@@ -29,7 +28,7 @@ app.post("/translate", function(req, res) {
     },
   };
 
-  request.post(options, function(error, response, body) {
+  request.post(options, function (error, response, body) {
     console.log(body);
     res.send(body);
   });
@@ -47,6 +46,6 @@ app.post("/translate", function(req, res) {
   //   }
   // });
 });
-app.listen(3001, function() {
+app.listen(3001, function () {
   console.log("http://127.0.0.1:3001/translate app listening on port 3001!");
 });

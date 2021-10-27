@@ -1,8 +1,9 @@
 var express = require("express");
 var cors = require("cors");
 var app = express();
-var client_id = "92iZUSj8wBJoqjCWRB7j";
-var client_secret = "mm5WgNn8l7";
+var { apiKey } = require("./config/apiKey");
+var client_id = apiKey.cfr.id;
+var client_secret = apiKey.cfr.secret;
 var fs = require("fs");
 
 // cors
@@ -10,7 +11,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 
-app.post("/face", function(req, res) {
+app.post("/face", function (req, res) {
   var request = require("request");
   const obj = JSON.parse(JSON.stringify(req.body));
   //var api_url = "https://openapi.naver.com/v1/vision/celebrity"; // 유명인 인식
@@ -34,7 +35,7 @@ app.post("/face", function(req, res) {
         "X-Naver-Client-Secret": client_secret,
       },
     },
-    function(error, response, body) {
+    function (error, response, body) {
       console.log(body);
       console.log(_req.body);
       res.send(body);
@@ -44,6 +45,6 @@ app.post("/face", function(req, res) {
   // res.send(result);
 });
 
-app.listen(3000, function() {
+app.listen(3000, function () {
   console.log("http://127.0.0.1:3000/face app listening on port 3000!");
 });
