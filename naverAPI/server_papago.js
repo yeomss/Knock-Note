@@ -1,23 +1,23 @@
+/* eslint-disable no-unused-vars */
 var express = require("express");
 var app = express();
 var cors = require("cors");
+var request = require("request");
 var { apiKey } = require("./config/apiKey");
 var client_id = apiKey.papago.id;
 var client_secret = apiKey.papago.secret;
 
+// cors
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 
+// translate
 app.post("/translate", function (req, res) {
-  //const obj = JSON.parse(JSON.stringify(req.body));
-  //console.log(obj);
   const obj = JSON.parse(JSON.stringify(req.body));
-  console.log(obj);
-  console.log(obj.query);
-  //var query = "잘가세요";
+
+  // API 주소
   var api_url = "https://openapi.naver.com/v1/papago/n2mt";
-  var request = require("request");
 
   var options = {
     url: api_url,
@@ -28,7 +28,7 @@ app.post("/translate", function (req, res) {
     },
   };
 
-  request.post(options, function (error, response, body) {
+  request.post(options, (err, res, body) => {
     console.log(body);
     res.send(body);
   });

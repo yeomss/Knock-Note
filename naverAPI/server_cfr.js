@@ -1,21 +1,26 @@
+/* eslint-disable no-unused-vars */
 var express = require("express");
 var cors = require("cors");
 var app = express();
-var { apiKey } = require("./config/apiKey");
+var fs = require("fs");
+var request = require("request");
+var { apiKey } = require("../config/apiKey");
 var client_id = apiKey.cfr.id;
 var client_secret = apiKey.cfr.secret;
-var fs = require("fs");
 
 // cors
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 
+// face
 app.post("/face", function (req, res) {
-  var request = require("request");
-  const obj = JSON.parse(JSON.stringify(req.body));
+  // API 주소
   //var api_url = "https://openapi.naver.com/v1/vision/celebrity"; // 유명인 인식
   var api_url = "https://openapi.naver.com/v1/vision/face"; // 얼굴 감지
+
+  // res 데이터
+  var obj = JSON.parse(JSON.stringify(req.body));
 
   var _formData = {
     //image: "image",
@@ -24,25 +29,20 @@ app.post("/face", function (req, res) {
     // image: obj.fileUrl,
   };
 
-  //var result;
-
-  var _req = request.post(
-    {
-      url: api_url,
-      formData: _formData,
-      headers: {
-        "X-Naver-Client-Id": client_id,
-        "X-Naver-Client-Secret": client_secret,
-      },
+  var data = {
+    url: api_url,
+    formData: _formData,
+    headers: {
+      "X-Naver-Client-Id": client_id,
+      "X-Naver-Client-Secret": client_secret,
     },
-    function (error, response, body) {
-      console.log(body);
-      console.log(_req.body);
-      res.send(body);
-    }
-  );
-  // _req.pipe(res); // 브라우저로 출력
-  // res.send(result);
+  };
+
+  var _req = request.post(data, (err, res, body) => {
+    console.log(body);
+    console.log(_req.body);
+    res.send(body);
+  });
 });
 
 app.listen(3000, function () {

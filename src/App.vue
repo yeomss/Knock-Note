@@ -1,29 +1,7 @@
 <template>
   <div id="app">
-    <div class="header">
-      <img src="./assets/hellos_logo.png" />
-      <p><a href="javascript:location.reload()">Note Knock</a></p>
-      <div class="weatherNote" v-if="view">
-        <div>
-          <span><img :src="imgURL"/></span>
-          <div class="local">
-            <span>{{ country }}</span>
-            <span>{{ city }}</span>
-            <span>{{ weather[0].description }}</span>
-          </div>
-        </div>
-        <div class="temperature">
-          <span>현재온도&nbsp;{{ temp.toFixed(2) }}º</span>
-          <span>체감온도&nbsp;{{ feels_like.toFixed(2) }}º</span>
-        </div>
+    <header-view></header-view>
 
-        <!--국가명: {{ country }} 도시명 : {{ city }} 현재 온도:
-        {{ temp.toFixed(2) }}º 체감 온도: {{ feels_like.toFixed(2) }}º 날씨:{{
-          weather[0].description
-        }}-->
-      </div>
-      <p class="sub-title" style="font-size:70px; margin:0px;">낰낰</p>
-    </div>
     <div>
       <select class="category-filter" v-model="selected">
         <option value="">전체</option>
@@ -162,7 +140,7 @@
                     v-else
                     class="todolist"
                     type="text"
-                    style="text-decoration:line-through"
+                    style="text-decoration: line-through;"
                     v-model="note.Todo[index - 1]"
                     placeholder="할 일"
                   />
@@ -178,7 +156,7 @@
             <div v-else>
               <textarea
                 v-if="note.is_bold"
-                style="font-weight:bold"
+                style="font-weight: bold;"
                 class="note-textarea"
                 rows="9"
                 v-model="note.text"
@@ -186,7 +164,7 @@
               ></textarea>
               <textarea
                 v-else-if="note.is_under"
-                style="text-decoration:underline"
+                style="text-decoration: underline;"
                 class="note-textarea"
                 rows="9"
                 v-model="note.text"
@@ -194,7 +172,7 @@
               ></textarea>
               <textarea
                 v-else-if="note.is_incli"
-                style="fontStyle:italic"
+                style="fontstyle: italic;"
                 class="note-textarea"
                 rows="9"
                 v-model="note.text"
@@ -369,7 +347,7 @@
                   v-else
                   class="todolist"
                   type="text"
-                  style="text-decoration:line-through"
+                  style="text-decoration: line-through;"
                   v-model="note.Todo[index - 1]"
                   placeholder="할 일"
                 />
@@ -385,7 +363,7 @@
           <div v-else>
             <textarea
               v-if="note.is_bold"
-              style="font-weight:bold"
+              style="font-weight: bold;"
               class="note-textarea"
               rows="9"
               v-model="note.text"
@@ -393,7 +371,7 @@
             ></textarea>
             <textarea
               v-else-if="note.is_under"
-              style="text-decoration:underline"
+              style="text-decoration: underline;"
               class="note-textarea"
               rows="9"
               v-model="note.text"
@@ -401,7 +379,7 @@
             ></textarea>
             <textarea
               v-else-if="note.is_incli"
-              style="fontStyle:italic"
+              style="fontstyle: italic;"
               class="note-textarea"
               rows="9"
               v-model="note.text"
@@ -595,26 +573,23 @@
 </template>
 
 <script>
+import HeaderView from "./views/HeaderView.vue";
 import NoteEditor from "./components/NoteEditor.vue";
 import NoteSearch from "./components/Search.vue";
 import categoryadd from "./components/CategoryAdd.vue";
 import * as tmImage from "@teachablemachine/image";
 import * as cocoSSD from "@tensorflow-models/coco-ssd";
 import * as tf from "@tensorflow/tfjs";
-//import * as ps from "python-shell";
 import axios from "axios";
 var Vue = require("vue/dist/vue");
 import VueResource from "vue-resource";
 Vue.use(VueResource);
-// import fs from "file-system";
-// import os from "os";
-// import path from "path";
 
 let model;
 
 export default {
   name: "App",
-  data: function() {
+  data: function () {
     return {
       editorOpen: false,
       selected: "",
@@ -692,22 +667,13 @@ export default {
       fileReader: null,
       test: null,
       model: null,
-      view: false,
       webcam: null,
       lock_predicted: "",
-      country: "",
-      city: "",
-      temp: "",
-      feels_like: "",
-      weather: "",
-      lat: "",
-      lon: "",
-      imgURL: null,
     };
   },
 
   computed: {
-    hasResult: function() {
+    hasResult: function () {
       return this.posts.length > 0;
     },
   },
@@ -787,8 +753,8 @@ export default {
     deleteContentModalOut(index) {
       this.notes[index].contentModal = false;
     },
-    notesFilter: function(category, search) {
-      return this.notes.filter(function(note) {
+    notesFilter: function (category, search) {
+      return this.notes.filter(function (note) {
         return (
           (note.category == category || category == "") &&
           (note.text.includes(search) ||
@@ -797,11 +763,11 @@ export default {
         );
       });
     },
-    setNoteColor: function(index, color) {
+    setNoteColor: function (index, color) {
       this.notes[index].is_show = !this.notes[index].is_show;
       this.notes[index].theme = color;
     },
-    modalColor: function(index) {
+    modalColor: function (index) {
       this.notes[index].is_show = !this.notes[index].is_show;
     },
     searchNote(search) {
@@ -814,22 +780,22 @@ export default {
     deleteCategory(index) {
       this.categorys.splice(index, 1);
     },
-    modalCategory: function() {
+    modalCategory: function () {
       this.categorylist = !this.categorylist;
     },
-    addFavorite: function(index) {
+    addFavorite: function (index) {
       this.notes[index].favorite = true;
     },
-    deleteFavorite: function(index) {
+    deleteFavorite: function (index) {
       this.notes[index].favorite = false;
     },
-    setBold: function(index) {
+    setBold: function (index) {
       this.notes[index].is_bold = !this.notes[index].is_bold;
     },
-    setUnderbar: function(index) {
+    setUnderbar: function (index) {
       this.notes[index].is_under = !this.notes[index].is_under;
     },
-    setInclination: function(index) {
+    setInclination: function (index) {
       this.notes[index].is_incli = !this.notes[index].is_incli;
     },
     speak(text, opt_prop) {
@@ -859,29 +825,29 @@ export default {
       recognition.interimResults = false;
       recognition.maxAlternatives = 5;
       recognition.start();
-      recognition.onstart = function() {
+      recognition.onstart = function () {
         console.log(
           "음성인식이 시작 되었습니다. 이제 마이크에 무슨 말이든 하세요."
         );
       };
       var self = this;
-      recognition.onresult = function() {
+      recognition.onresult = function () {
         console.log("You said: ", event.results[0][0].transcript);
         self.notes[index].text =
           self.notes[index].text + event.results[0][0].transcript;
       };
     },
-    setFileExploer: function(index) {
+    setFileExploer: function (index) {
       //console.log("setFileExploer!", index);
       this.imgIndex = index;
       document.querySelector(".imageInput").click();
     },
-    setImageFile: function(event) {
+    setImageFile: function (event) {
       this.imgFile = event.target.files;
       this.fileReader = new FileReader();
       this.fileReader.readAsDataURL(this.imgFile[0]);
 
-      this.fileReader.onload = event => {
+      this.fileReader.onload = (event) => {
         this.imgUrl = event.target.result;
         //console.log(this.imgUrl);
         this.notes[this.imgIndex].img_path = this.imgUrl;
@@ -949,46 +915,16 @@ export default {
       console.log(tf.version.cocoSSD);
     },
 
-    searchWeather() {
-      const BASE_URL =
-        "http://api.openweathermap.org/data/2.5/weather?lat=" +
-        this.lat +
-        "&lon=" +
-        this.lon +
-        "&lang=kr&appid=95e8423951820d94ae0f14e1d78c5f86";
-      Vue.http.get(`${BASE_URL}`).then(result => {
-        this.country = result.data.sys.country;
-        this.city = result.data.name;
-        this.temp = result.data.main.temp - 273.15;
-        this.feels_like = result.data.main.feels_like - 273.15;
-        this.weather = result.data.weather;
-        this.imgURL =
-          "http://openweathermap.org/img/w/" + this.weather[0].icon + ".png";
-
-        this.view = true;
-        var header = document.getElementsByClassName("header");
-        if (this.weather[0].description === "튼구름") {
-          for (var i = 0; i < header.length; i++) {
-            header[i].style["background-color"] = "#BDBDBD";
-          }
-        } else if (this.weather[0].description === "구름조금") {
-          for (var j = 0; j < header.length; j++) {
-            header[j].style["background-color"] = "#E6E6E6";
-            //header[j].style["background-image"] = "url('./assets/logo.png')";
-          }
-        }
-      });
-    },
-
-    getMap() {
-      if (navigator.geolocation) {
-        var self = this;
-        navigator.geolocation.getCurrentPosition(function(position) {
-          (self.lat = position.coords.latitude), // 위도
-            (self.lon = position.coords.longitude); // 경도
-        });
-      }
-    },
+    // 날씨
+    // getMap() {
+    //   if (navigator.geolocation) {
+    //     var self = this;
+    //     navigator.geolocation.getCurrentPosition(function (position) {
+    //       (self.lat = position.coords.latitude), // 위도
+    //         (self.lon = position.coords.longitude); // 경도
+    //     });
+    //   }
+    // },
 
     modalLock(index) {
       //console.log("modal: ", index);
@@ -1004,7 +940,7 @@ export default {
       this.notes[index].img_comment_modal = false;
     },
 
-    detectEmotion: async function(index) {
+    detectEmotion: async function (index) {
       //let tmp;
       let result;
       //let emotion;
@@ -1022,7 +958,7 @@ export default {
           fileUrl: "G:/Repository/OpenSourceProject/src/assets/" + filename,
           //fileUrl: file,
         })
-        .then(res => {
+        .then((res) => {
           //console.log(res.data);
           result = res.data["faces"][0];
           this.notes[index].emotion = result["emotion"]["value"];
@@ -1031,7 +967,7 @@ export default {
       //console.log(this.notes[index].emotion);
     },
 
-    translateNote: async function(index) {
+    translateNote: async function (index) {
       this.notes[index].translate_modal = !this.notes[index].translate_modal;
       //console.log("번역" + index + this.notes[index].translate_modal);
       //var query = "안녕하세요";
@@ -1043,7 +979,7 @@ export default {
           //let query = "내 이름은 별입니다.";
           //console.log(query);
         })
-        .then(res => {
+        .then((res) => {
           //result = json["message"];
           this.notes[index].translate =
             res.data["message"]["result"].translatedText;
@@ -1055,7 +991,7 @@ export default {
   },
 
   async mounted() {
-    this.getMap();
+    // this.getMap();
     if (localStorage.getItem("notes")) {
       this.notes = JSON.parse(localStorage.getItem("notes"));
       let baseURL = "https://teachablemachine.withgoogle.com/models/OsUYBFECF/";
@@ -1073,7 +1009,7 @@ export default {
     model = await cocoSSD.load();
 
     console.log("model loaded");
-    this.searchWeather();
+    // this.searchWeather();
   },
 
   watch: {
@@ -1093,10 +1029,10 @@ export default {
   },
 
   components: {
+    HeaderView,
     appNoteEditor: NoteEditor,
     SearchNote: NoteSearch,
     categoryadd: categoryadd,
-    //Webcam: WebCam,
   },
 };
 </script>
