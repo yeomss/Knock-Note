@@ -1,4 +1,4 @@
-# ✅ Opensource-Project-Note-App
+# 🎀 Opensource-Project-Note-App
 ![](https://github.com/dua9920/Open-Source-Note-App/blob/main/src/assets/noteKnock.png)
 
 <b>2020 오픈소스 프로젝트 - 노트 웹 애플리케이션</b>
