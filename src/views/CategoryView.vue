@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- 카테고리 필터 -->
-    <select class="category-filter" v-model="selected">
+    <select class="category-filter" v-model="selectedCategory">
       <option value="">전체</option>
       <option v-for="list in categorys" :key="list">
         {{ list }}
@@ -11,14 +11,14 @@
     <!-- 카테고리 수정 버튼 -->
     <button
       class="category-edit"
-      @click="modalCategory()"
+      @click="modalCategory"
       @click.prevent="categoryMain = true"
     >
       카테고리 수정
     </button>
 
     <!-- 카테고리 필터의 리스트 -->
-    <div v-if="categorylist">
+    <div v-if="categoryList">
       <div>
         <div class="category-modal-content">
           <div
@@ -55,24 +55,24 @@ import CategoryAdd from "../components/CategoryAdd.vue";
 export default {
   data() {
     return {
-      categorys: ["기본", "To-do List"],
-      selected: "",
-      categorylist: false,
-      categoryMain: false,
+      categorys: this.$store.state.categorys,
+      selectedCategory: this.$store.state.selectedCategory,
+      categoryList: this.$store.state.categoryList,
+      categoryMain: this.$store.state.categoryMain,
     };
   },
   methods: {
     // 카테고리 모달 띄우기
     modalCategory() {
-      this.categorylist = !this.categorylist;
+      this.$store.dispatch("CLICK_CATEGORY_MODAL");
     },
     // 카테고리 삭제하기
     deleteCategory(index) {
-      this.categorys.splice(index, 1);
+      this.$store.dispatch("CLICK_DELETE_CATEGORY", index);
     },
     // 카테고리 추가하기
     addCategory(category) {
-      this.categorys.push(category);
+      this.$store.dispatch("CLICK_ADD_CATEGORY", category);
     },
   },
   components: {

@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- 즐겨찾기 해제 -->
-    <delete-favorite :index="index" />
+    <set-favorite :index="index" />
 
     <!-- 노트 삭제 -->
     <delete-note :index="index" />
@@ -72,6 +72,9 @@
       <!-- 이미지 업로드란 -->
       <set-image :index="index" />
 
+      <!-- 노트 잠금 -->
+      <lock-note Lindex="index" :note="note" />
+
       <!-- 이미지 감정 예측 -->
       <predicted-image-emotion :index="index" :note="note" />
     </div>
@@ -81,7 +84,7 @@
 <script>
 import ToDoNoteView from "./ToDoNoteView..vue";
 import TextDecoView from "./TextDecoView.vue";
-import DeleteFavorite from "../components/DeleteFavorite.vue";
+import SetFavorite from "../components/SetFavorite.vue";
 import SetTextDeco from "../components/setTextDeco.vue";
 import SetTheme from "../components/setTheme.vue";
 import SetImage from "../components/setImage.vue";
@@ -92,18 +95,13 @@ import PredictedImageEmotion from "../components/PredictedImageEmotion.vue";
 import TranslateNote from "../components/TranslateNote.vue";
 import VoiceToNote from "../components/VoiceToNote.vue";
 import SpeakNote from "../components/SpeakNote.vue";
+import LockNote from "../components/LockNote.vue";
 
 export default {
   props: ["index", "note"],
 
-  data() {
-    return {
-      categorys: this.$store.state.categorys,
-    };
-  },
-
   components: {
-    DeleteFavorite,
+    SetFavorite,
     DeleteNote,
     DeleteNoteContent,
     TranslateNote,
@@ -116,6 +114,7 @@ export default {
     SetTheme,
     PredictedImageEmotion,
     SetImage,
+    LockNote,
   },
 };
 </script>

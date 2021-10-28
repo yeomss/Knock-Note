@@ -1,26 +1,26 @@
 <template>
- <div class="search-filter">
+  <div class="search-filter">
     <form>
-      <input v-model="search" placeholder="Search">
-      <button @click.prevent=SearchNote>검색</button>
+      <input v-model="search" placeholder="Search" />
+      <button @click.prevent="SearchNote">검색</button>
     </form>
   </div>
 </template>
 
 <script>
 export default {
-    data: function() {
-        return {
-            search:'',
-            is_search:false,
-        }
+  data: function () {
+    return {
+      search: "",
+      isSearch: false,
+    };
+  },
+  methods: {
+    SearchNote() {
+      this.$emit("noteSearched", this.search, this.isSearch);
+      this.search = "";
+      this.isSearch = false;
     },
-    methods: {        
-        SearchNote() {
-            this.$emit('noteSearched',this.search, this.is_search);
-            this.search='';
-            this.is_search=false;
-        },
-    },
-}
+  },
+};
 </script>

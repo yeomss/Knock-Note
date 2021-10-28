@@ -1,7 +1,7 @@
 <template>
   <!-- 즐겨찾기 해제 -->
   <span class="favorites">
-    <i class="fas fa-star" @click="addFavorite(index)"></i>
+    <i class="fas fa-star" @click="deleteFavorite(index)"></i>
   </span>
 </template>
 
@@ -10,8 +10,8 @@ export default {
   props: ["index"],
 
   methods: {
-    addFavorite(index) {
-      this.$store.dispatch("CLICK_ADD_FAVORITE", index);
+    deleteFavorite(index) {
+      this.$store.dispatch("CLICK_DELETE_FAVORITE", index);
     },
   },
 };

@@ -1,38 +1,45 @@
 <template>
-  <div v-show="notes[index].imgPath" class="note-image-wrap">
+  <div v-show="note.imgPath" class="note-image-wrap">
     <img
       class="note-image"
-      :src="notes[index].imgPath"
+      :src="note.imgPath"
       v-on:mouseover="imageCommentModalIn(index)"
       v-on:mouseout="imageCommentModalOut(index)"
     />
-    <div v-show="notes[index].imgComment" class="imageCommentModal">
-      {{ note.predicted }}
+    <div v-show="note.imgComment" class="imageCommentModal">
+      {{ note.predictedImage }}
     </div>
   </div>
 </template>
 
 <script>
 /* eslint-disable no-unused-vars */
+import * as cocoSSD from "@tensorflow-models/coco-ssd";
 
 export default {
-  props: ["index", "notes", "model"],
+  props: ["index", "note"],
+
+  data() {
+    return {
+      model: "",
+    };
+  },
+
+  async created() {
+    this.model = await cocoSSD.load();
+  },
+
   methods: {
     async predict(index) {
-      let noteImage = new Image();
-      noteImage.src = this.notes[index].imgPath;
-
-      // let img = noteImage;
-      let tmp = await this.props.model.detect(noteImage);
-      this.notes[index].predictedImage = tmp[0].class;
-      this.notes[index].imgComment = this.notes[index].predicted;
+      this.$store.dispatch("PREDICT_IMAGE", index, this.model);
     },
     imageCommentModalIn(index) {
       this.predict(index);
-      this.notes[index].imgComment = true;
+      this.$store.dispatch("OVER_IN_NOTE_PREDICT_IMAGE_MODAL", index);
     },
     imageCommentModalOut(index) {
-      this.notes[index].imgComment = false;
+      this.predict(index);
+      this.$store.dispatch("OVER_OUT_NOTE_PREDICT_IMAGE_MODAL", index);
     },
   },
 };

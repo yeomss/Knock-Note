@@ -3,21 +3,12 @@
 </template>
 
 <script>
-import axios from "axios";
-
 export default {
-  props: ["index", "notes"],
+  props: ["index"],
+
   methods: {
-    translateNote: function (index) {
-      this.notes[index].translateModal = !this.notes[index].translateModal;
-
-      var url = "http://127.0.0.1:3001/translate";
-      var data = this.notes[index].text;
-
-      axios.post(url, data).then((res) => {
-        this.notes[index].translatedText =
-          res.data["message"]["result"].translatedText;
-      });
+    translateNote(index) {
+      this.$store.dispatch("CLICK_PAPAGO", index);
     },
   },
 };

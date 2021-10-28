@@ -3,219 +3,40 @@
     <header-view></header-view>
     <category-view></category-view>
     <search-note @noteSearched="searchNote"></search-note>
-    <favorite-view :index="0" :notes="notess"></favorite-view>
 
     <!-- 즐겨찾기 부분 -->
     <table class="noteContainer">
       <div class="note-favorite">
+        <h1>즐겨찾기 부분</h1>
         <tr
-          v-for="(note, index) in notesFilter(selected, search)"
-          v-show="note.favorite"
+          v-for="(note, index) in notesFilter(selectedCategory, search)"
+          v-show="note.isFavorite"
           :key="`note-${index}`"
           class="note"
           :style="{ 'background-color': note.theme }"
         >
-          <!-- 이부분이 컴포넌트화 될 것임 -->
-          <div v-if="note.lock != true">
-            <span class="favorites">
-              <i class="fas fa-star" @click="deleteFavorite(index)"></i>
-            </span>
-            <span class="delete" @click.prevent="deleteNote(index)">
-              <i class="fas fa-times"></i>
-            </span>
-            <span
-              v-if="note.category != 'To-do List'"
-              class="deleteContent"
-              @click.prevent="deleteNoteContents(index)"
-            >
-              <i
-                v-on:mouseover="deleteContentModalIn(index)"
-                v-on:mouseout="deleteContentModalOut(index)"
-                class="fas fa-trash-alt"
-              ></i>
-            </span>
-            <div v-if="note.contentModal == true" class="contentDeleteModal">
-              노트 내용 삭제
-            </div>
-            <span class="note-date-span">
-              <font class="note-date" size="2em" color="#FFFFFF">
-                {{ note.time }}
-                <u>
-                  <i>By {{ note.nickname }}</i>
-                </u>
-              </font>
-            </span>
-            <input
-              class="title-view"
-              type="text"
-              v-model="note.title"
-              placeholder="Title"
-            />
-            <i
-              @click="translateNote(index)"
-              class="fas fa-language translate-note"
-            >
-            </i>
-            <transition name="bounce">
-              <div v-show="note.translate_modal" class="translateModal">
-                {{ note.translate }}
-              </div>
-            </transition>
-            <div v-show="note.img_path" class="note-image-wrap">
-              <img
-                class="note-image"
-                :src="note.img_path"
-                v-on:mouseover="imageCommentModalIn(index)"
-                v-on:mouseout="imageCommentModalOut(index)"
-              />
-              <div v-show="note.img_comment_modal" class="imageCommentModal">
-                {{ note.predicted }}
-              </div>
-            </div>
-
-            <div v-if="note.category === 'To-do List'" id="checkbox">
-              <div v-for="index in note.listCount" :key="index">
-                <input
-                  type="checkbox"
-                  id="note.Todo[index-1]"
-                  value="note.Todo[index-1]"
-                  v-model="note.checked[index - 1]"
-                />
-                <label for="note.Todo[index-1]">
-                  <input
-                    v-if="note.checked[index - 1] != true"
-                    class="todolist"
-                    type="text"
-                    v-model="note.Todo[index - 1]"
-                    placeholder="할 일"
-                  />
-                  <input
-                    v-else
-                    class="todolist"
-                    type="text"
-                    style="text-decoration: line-through;"
-                    v-model="note.Todo[index - 1]"
-                    placeholder="할 일"
-                  />
-                </label>
-              </div>
-              <i
-                class="fas fa-plus"
-                v-if="note.listCount < 6"
-                @click.prevent="note.listCount++"
-              >
-              </i>
-            </div>
-            <div v-else>
-              <textarea
-                v-if="note.is_bold"
-                style="font-weight: bold;"
-                class="note-textarea"
-                rows="9"
-                v-model="note.text"
-                placeholder="Take a note..."
-              ></textarea>
-              <textarea
-                v-else-if="note.is_under"
-                style="text-decoration: underline;"
-                class="note-textarea"
-                rows="9"
-                v-model="note.text"
-                placeholder="Take a note..."
-              ></textarea>
-              <textarea
-                v-else-if="note.is_incli"
-                style="fontstyle: italic;"
-                class="note-textarea"
-                rows="9"
-                v-model="note.text"
-                placeholder="Take a note..."
-              ></textarea>
-              <textarea
-                v-else
-                class="note-textarea"
-                rows="9"
-                v-model="note.text"
-                placeholder="Take a note..."
-              ></textarea>
-            </div>
-            <hr />
-            <span v-if="note.category != 'To-do List'">
-              <span class="textform-B" @click="setBold(index)">B</span>
-              <span class="textform-U" @click="setUnderbar(index)">U</span>
-              <span class="textform-I" @click="setInclination(index)">I</span>
-            </span>
-            <span class="category-form">
-              <select v-model="note.category">
-                <option v-for="list in categorys" :key="list">
-                  {{ list }}
-                </option>
-              </select>
-            </span>
-            <span
-              v-if="note.category != 'To-do List'"
-              class="speech-to-text"
-              @click="speech_to_text(index)"
-            >
-              <i class="fas fa-microphone"></i>
-            </span>
-            <span
-              v-if="note.category === 'To-do List' && note.checked != true"
-              class="text-to-speech"
-              @click="
-                speak('To do List 목록\n' + note.Todo, {
-                  rate: 1,
-                  pitch: 1.2,
-                  lang: ko - KR,
-                })
-              "
-            >
-              <i class="fas fa-volume-up"></i>
-            </span>
-            <span
-              v-if="note.category != 'To-do List'"
-              class="text-to-speech"
-              @click="speak(note.text, { rate: 1, pitch: 1.2, lang: ko - KR })"
-            >
-              <i class="fas fa-volume-up"></i>
-            </span>
-            <span class="note-color" @click="modalColor(index)">
-              <i class="fas fa-palette"></i>
-            </span>
-            <div class="note-colorform" v-show="notes[index].is_show">
-              <ul>
-                <li class="color1" @click="setNoteColor(index, colors[0])"></li>
-                <li class="color2" @click="setNoteColor(index, colors[1])"></li>
-                <li class="color3" @click="setNoteColor(index, colors[2])"></li>
-                <li class="color4" @click="setNoteColor(index, colors[3])"></li>
-                <li class="color5" @click="setNoteColor(index, colors[4])"></li>
-              </ul>
-            </div>
-
-            <div class="imageInputBox">
-              <form>
-                <input
-                  class="imageInput"
-                  type="file"
-                  accept="image/*"
-                  v-on:change="setImageFile($event)"
-                />
-              </form>
-              <button class="imageInputBtn" v-on:click="setFileExploer(index)">
-                이미지 업로드
-              </button>
-              <span class="note-face">
-                <i class="far fa-smile-wink" @click="detectEmotion(index)"></i>
-              </span>
-              <span class="emotionModal">I FEEL LIKE #{{ note.emotion }}</span>
-            </div>
-          </div>
+          <favorite-view :index="index" :note="note"></favorite-view>
         </tr>
       </div>
 
       <hr class="part-line" />
-      <!--notes part-->
-      <div class="note-part"></div>
+
+      <h1>퓨어 노트 파트</h1>
+      <div class="note-part">
+        <tr
+          v-for="(note, index) in notesFilter(selectedCategory, search)"
+          v-show="!note.isFavorite"
+          :key="`note-${index}`"
+          class="note"
+          :style="{ 'background-color': note.theme }"
+        >
+          <div v-if="!note.isLock">
+            <pure-view :index="index" :note="note"></pure-view>
+          </div>
+        </tr>
+      </div>
+
+      <!-- <div class="note-part"></div>
       <tr
         v-for="(note, index) in notesFilter(selected, search)"
         v-show="!note.favorite"
@@ -497,9 +318,9 @@
                 v-bind="setunlock(index)"
               ></span>
             </div>
-            <!-- <button @click="endCam(index)">
+             <button @click="endCam(index)">
             취소
-          </button> -->
+          </button> 
           </transition>
         </div>
         <div class="note-lock-layer" v-show="note.webCamStart"></div>
@@ -520,7 +341,7 @@
           class="fas fa-plus"
           @click.prevent="editorOpen = !editorOpen"
         ></i>
-      </button>
+      </button> -->
     </table>
   </div>
 </template>
@@ -532,13 +353,13 @@ import CategoryView from "./views/CategoryView.vue";
 import FavoriteView from "./views/FavoriteView.vue";
 import NoteEditor from "./components/NoteEditor.vue";
 import SearchNote from "./components/SearchNote.vue";
-import categoryadd from "./components/CategoryAdd.vue";
 import * as tmImage from "@teachablemachine/image";
 import * as cocoSSD from "@tensorflow-models/coco-ssd";
 import * as tf from "@tensorflow/tfjs";
 import axios from "axios";
 var Vue = require("vue/dist/vue");
 import VueResource from "vue-resource";
+import PureView from "./views/PureView.vue";
 Vue.use(VueResource);
 
 let model;
@@ -546,81 +367,18 @@ let model;
 export default {
   name: "App",
   created() {
-    localStorage.setItem("notess", JSON.stringify(this.$store.state.notes));
-    this.notess = JSON.parse(localStorage.getItem("notess"));
-    console.log("notess: ", this.notess);
+    localStorage.setItem("notes", JSON.stringify(this.$store.state.notes));
+    this.notes = JSON.parse(localStorage.getItem("notes"));
+    console.log("notes: ", this.notes);
   },
   data: function () {
     return {
-      notess: null,
+      notes: null, // 해당 노트들
+      selectedCategory: this.$store.state.selectedCategory,
+
       editorOpen: false,
-      selected: "",
       search: "",
       is_search: false,
-      categorylist: false,
-      categoryMain: false,
-      notes: [
-        {
-          category: "기본",
-          nickname: "user1",
-          title: "예시노트1",
-          text: "첫번째 노트입니다",
-          theme: "#F4CCCC",
-          time: "2020-10-25 Sun",
-          favorite: false,
-          is_show: false,
-          Todo: [],
-          checked: [],
-          listCount: 1,
-          is_bold: false,
-          is_under: false,
-          is_incli: false,
-          img_path: "",
-          contentModal: false,
-          lock: false,
-          lock_answer: false,
-          lock_value: "",
-          webCamStart: false,
-          predicted: "",
-          lock_modal: false,
-          img_comment: "인식하지 못하였습니다.",
-          filename: "",
-          emotion: "NoteKnock",
-          translate: "",
-          translate_modal: false,
-        },
-        {
-          category: "To-do List",
-          nickname: "user2",
-          title: "예시노트2",
-          text: "카테고리에 따라 바뀌는 내용입니다",
-          theme: "#FFF2CC",
-          time: "2020-10-25 Sun",
-          favorite: false,
-          is_show: false,
-          Todo: [],
-          checked: [],
-          listCount: 1,
-          is_bold: false,
-          is_under: false,
-          is_incli: false,
-          img_path: "",
-          contentModal: false,
-          lock: false,
-          lock_answer: false,
-          lock_value: "",
-          webCamStart: false,
-          predicted: "",
-          lock_modal: false,
-          img_comment: "인식하지 못하였습니다.",
-          filename: "",
-          emotion: "NoteKnock",
-          translate: "",
-          translate_modal: false,
-        },
-      ],
-      categorys: ["기본", "To-do List"],
-      colors: ["#F4CCCC", "#EB9F9F", "#E7D9E7", "#FFF2CC", "#F2F2F2"],
       underbarCnt: 0,
       inclinationCnt: 0,
       imgFile: null,
@@ -715,8 +473,8 @@ export default {
     deleteContentModalOut(index) {
       this.notes[index].contentModal = false;
     },
-    notesFilter: function (category, search) {
-      return this.notes.filter(function (note) {
+    notesFilter(category, search) {
+      return this.notes.filter((note) => {
         return (
           (note.category == category || category == "") &&
           (note.text.includes(search) ||
@@ -736,21 +494,7 @@ export default {
       this.search = search;
       this.is_search = true;
     },
-    addCategory(category) {
-      this.categorys.push(category);
-    },
-    deleteCategory(index) {
-      this.categorys.splice(index, 1);
-    },
-    modalCategory: function () {
-      this.categorylist = !this.categorylist;
-    },
-    addFavorite: function (index) {
-      this.notes[index].favorite = true;
-    },
-    deleteFavorite: function (index) {
-      this.notes[index].favorite = false;
-    },
+
     setBold: function (index) {
       this.notes[index].is_bold = !this.notes[index].is_bold;
     },
@@ -863,32 +607,10 @@ export default {
       this.webcam = null;
       this.lock_predicted = "";
     },
-    async predict(index) {
-      let noteImage = new Image();
-      noteImage.src = this.notes[index].img_path;
-      const img = noteImage;
-      let tmp = await model.detect(img);
-      this.notes[index].predicted = tmp[0].class;
-      this.notes[index].img_comment_modal = this.notes[index].predicted;
-      //const img = document.getElementById("detectedImage");
-      //console.log(this.notes[index].predicted);
-      //console.log(index);
-      //console.log("index", index, img);
-      console.log(tf.version.cocoSSD);
-    },
 
     modalLock(index) {
       //console.log("modal: ", index);
       this.notes[index].lock_modal = !this.notes[index].lock_modal;
-    },
-
-    imageCommentModalIn(index) {
-      this.predict(index);
-      this.notes[index].img_comment_modal = true;
-    },
-
-    imageCommentModalOut(index) {
-      this.notes[index].img_comment_modal = false;
     },
 
     detectEmotion: async function (index) {
@@ -983,9 +705,10 @@ export default {
     HeaderView,
     CategoryView,
     FavoriteView,
+    PureView,
+    // eslint-disable-next-line vue/no-unused-components
     appNoteEditor: NoteEditor,
     SearchNote,
-    // categoryadd: categoryadd,
   },
 };
 </script>

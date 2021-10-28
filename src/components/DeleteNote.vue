@@ -6,10 +6,11 @@
 
 <script>
 export default {
-  props: ["index", "notes"],
+  props: ["index"],
+
   methods: {
     deleteNote(index) {
-      this.notes.splice(index, 1);
+      this.$store.dispatch("CLICK_DELETE_NOTE", index);
     },
   },
 };

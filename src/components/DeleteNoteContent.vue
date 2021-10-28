@@ -1,6 +1,6 @@
 <template>
   <span
-    v-if="notes.category != 'To-do List'"
+    v-if="note.category != 'To-do List'"
     class="deleteContent"
     @click.prevent="deleteNoteContents(index)"
   >
@@ -14,19 +14,16 @@
 
 <script>
 export default {
-  props: ["index", "notes"],
+  props: ["index", "note"],
   methods: {
     deleteNoteContents(index) {
-      this.notes[index].text = "";
-      this.notes[index].imgPath = null;
-      this.notes[index].emotion = "NoteKnock";
-      console.log(this.notes[index]);
+      this.$store.dispatch("CLICK_DELETE_NOTE_CONTENT", index);
     },
     deleteContentModalIn(index) {
-      this.notes[index].contentModal = true;
+      this.$store.dispatch("OVER_IN_NOTE_CONTENT_MODAL", index);
     },
     deleteContentModalOut(index) {
-      this.notes[index].contentModal = false;
+      this.$store.dispatch("OVER_OUT_NOTE_CONTENT_MODAL", index);
     },
   },
 };
