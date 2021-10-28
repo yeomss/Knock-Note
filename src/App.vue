@@ -14,7 +14,6 @@
     <!-- 즐겨찾기 부분 -->
     <table class="noteContainer">
       <div class="note-favorite">
-        <h1>즐겨찾기 부분</h1>
         <tr
           v-for="(note, index) in notesFilter(selectedCategory, search)"
           v-show="note.isFavorite"
@@ -28,7 +27,6 @@
 
       <hr class="part-line" />
 
-      <h1>퓨어 노트 파트</h1>
       <div class="note-part">
         <tr
           v-for="(note, index) in notesFilter(selectedCategory, search)"
@@ -47,7 +45,6 @@
         </tr>
       </div>
 
-      <h2>그밖의</h2>
       <note-editor
         class="note-editor-container"
         v-if="editorOpen"
@@ -86,7 +83,7 @@ export default {
       notes: null, // 해당 노트들
       model: null, // 모델
       selectedCategory: "",
-      categorys: this.$store.state.categorys,
+      categorys: null,
       editorOpen: false, // 노트 생성기가 열렸는지
 
       search: "",
@@ -98,6 +95,10 @@ export default {
 
   async created() {
     localStorage.setItem("notes", JSON.stringify(this.$store.state.notes));
+    localStorage.setItem(
+      "categorys",
+      JSON.stringify(this.$store.state.categorys)
+    );
   },
 
   async mounted() {

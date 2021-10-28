@@ -14,7 +14,7 @@
       <div>
         <div class="category-modal-content">
           <div
-            v-for="(list, index) in categorys"
+            v-for="(list, index) in this.$store.state.categorys"
             :key="`list-${index}`"
             class="category"
           >
@@ -42,7 +42,6 @@ import CategoryAdd from "../components/CategoryAdd.vue";
 export default {
   data() {
     return {
-      categorys: this.$store.state.categorys,
       categoryMain: this.$store.state.categoryMain,
     };
   },
