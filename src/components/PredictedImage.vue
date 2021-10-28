@@ -13,20 +13,13 @@
 </template>
 
 <script>
-/* eslint-disable no-unused-vars */
-import * as cocoSSD from "@tensorflow-models/coco-ssd";
-
 export default {
   props: ["index", "note"],
 
   data() {
     return {
-      model: "",
+      model: this.$store.state.model,
     };
-  },
-
-  async created() {
-    this.model = await cocoSSD.load();
   },
 
   methods: {

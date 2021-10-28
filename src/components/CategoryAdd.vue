@@ -1,16 +1,18 @@
 <template>
-  <div class="categoryAdd" style="text-align:center;">
-    <input class="category-modal-input" type="text" v-model="category" placeholder="category" />
-    <button
-      class="category-modal-add"
-      @click.prevent="addCategory"
-    >
+  <div class="categoryAdd" style="text-align: center;">
+    <input
+      class="category-modal-input"
+      type="text"
+      v-model="category"
+      placeholder="category"
+    />
+    <button class="category-modal-add" @click.prevent="addCategory(category)">
       추가
     </button>
     <button
       class="category-modal-cancle"
       v-if="main"
-      @click.prevent="categoryCancle"
+      @click.prevent="modalCategory"
     >
       취소
     </button>
@@ -19,22 +21,23 @@
 
 <script>
 export default {
-  data: function() {
+  props: ["main"],
+
+  data: function () {
     return {
       category: "",
     };
   },
-  props: ["main"],
+
   methods: {
-    addCategory() {
-      this.$emit("categoryAdd", this.category);
-      this.category = "";
-    },
     deleteCategory(index) {
-      this.$emit("categoryDeleted", index);
+      this.$store.dispatch("CLICK_DELETE_CATEGORY", index);
     },
-    categoryCancle() {
-      this.$emit("categoryCancle");
+    addCategory(category) {
+      this.$store.dispatch("CLICK_ADD_CATEGORY", category);
+    },
+    modalCategory() {
+      this.$store.dispatch("CLICK_CATEGORY_MODAL");
     },
   },
 };

@@ -1,13 +1,5 @@
 <template>
   <div>
-    <!-- 카테고리 필터 -->
-    <select class="category-filter" v-model="selectedCategory">
-      <option value="">전체</option>
-      <option v-for="list in categorys" :key="list">
-        {{ list }}
-      </option>
-    </select>
-
     <!-- 카테고리 수정 버튼 -->
     <button
       class="category-edit"
@@ -18,7 +10,7 @@
     </button>
 
     <!-- 카테고리 필터의 리스트 -->
-    <div v-if="categoryList">
+    <div v-show="this.$store.state.isCategoryModalShow">
       <div>
         <div class="category-modal-content">
           <div
@@ -34,12 +26,7 @@
           </div>
 
           <!-- 카테고리 추가 버튼 -->
-          <category-add
-            :main="categoryMain"
-            @categoryAdd="addCategory"
-            @categoryDeleted="deleteCategory"
-            @categoryCancle="modalCategory"
-          ></category-add>
+          <category-add :main="categoryMain"></category-add>
         </div>
 
         <!-- 카테고리 모달 배경 쉐도우 -->
@@ -56,11 +43,10 @@ export default {
   data() {
     return {
       categorys: this.$store.state.categorys,
-      selectedCategory: this.$store.state.selectedCategory,
-      categoryList: this.$store.state.categoryList,
       categoryMain: this.$store.state.categoryMain,
     };
   },
+
   methods: {
     // 카테고리 모달 띄우기
     modalCategory() {

@@ -38,6 +38,7 @@
       </div>
     </transition>
 
+    <!-- 여기까지 -->
     <!-- 이미지 -->
     <predicted-image :index="index" :note="note" />
 
@@ -73,7 +74,7 @@
       <set-image :index="index" />
 
       <!-- 노트 잠금 -->
-      <lock-note Lindex="index" :note="note" />
+      <lock-note :index="index" :note="note" />
 
       <!-- 이미지 감정 예측 -->
       <predicted-image-emotion :index="index" :note="note" />
@@ -99,6 +100,11 @@ import LockNote from "../components/LockNote.vue";
 
 export default {
   props: ["index", "note"],
+  data() {
+    return {
+      categorys: this.$store.state.categorys,
+    };
+  },
 
   components: {
     SetFavorite,

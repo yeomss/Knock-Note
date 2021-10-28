@@ -1,15 +1,19 @@
 import axios from "axios";
+import * as tmImage from "@teachablemachine/image";
 
 export default {
   // 카테고리
   modalCategory(state) {
-    state.categoryModal = !state.categoryModal;
+    state.isCategoryModalShow = !state.isCategoryModalShow;
   },
   deleteCategory(state, index) {
     state.categorys.splice(index, 1);
   },
   addCategory(state, category) {
     state.categorys.push(category);
+  },
+  setSelectedCategory(state, category) {
+    state.selectedCategory = category;
   },
 
   // 노트 삭제
@@ -143,5 +147,48 @@ export default {
         result = res.data["faces"][0];
         state.notes[index].emotion = result["emotion"]["value"];
       });
+  },
+
+  // 노트 잠금
+  lockModal(state, index) {
+    state.notes[index].isLockModal = !state.notes[index].isLockModal;
+  },
+  setNoteLock(state, index) {
+    state.notes[index].isLock = true;
+  },
+
+  // 노트 잠금 해제 & 카메라
+  async lockPredict(state) {
+    let prediction = await state.model.predictTopK(
+      state.webcam.canvas,
+      1,
+      true
+    );
+    state.predictedLock = prediction[0].className;
+  },
+  async startCam(state) {
+    state.webcam = new tmImage.Webcam(200, 200, true);
+    await state.webcam.setup(); // request access to the webcam
+
+    await state.webcam.play();
+    document.getElementById("cam").appendChild(state.webcam.canvas);
+  },
+  startNoteCam(state, index) {
+    state.notes[index].webCamStart = true;
+  },
+  endCam(state, index) {
+    state.notes[index].webCamStart = false;
+    state.webcam.stop();
+    state.webcam = null;
+    state.predictedLock = "";
+  },
+  setNoteUnLock(state, index) {
+    state.notes[index].lock = false;
+    state.webcam.stop();
+    state.webcam = null;
+    state.predictedLock = "";
+    state.notes[index].webCamStart = false;
+    state.notes[index].lockAnswer = false;
+    state.notes[index].isLockModal = false;
   },
 };

@@ -51,6 +51,9 @@ export default {
   CLICK_DELETE_CATEGORY({ commit }, index) {
     commit("deleteCategory", index);
   },
+  CLICK_FILTER_CATEGORY({ commit }, category) {
+    commit("setSelectedCategory", category);
+  },
 
   // 텍스트 효과
   CLICK_BOLD({ commit }, index) {
@@ -85,5 +88,28 @@ export default {
   },
   CLICK_PREDICT_IMAGE({ commit }, index) {
     commit("predictImageEmotion", index);
+  },
+
+  // 노트 잠금
+  CLICK_LOCK_NOTE_MODAL({ commit }, index) {
+    commit("lockModal", index);
+  },
+  CLICK_LOCK_NOTE({ commit }, index) {
+    commit("setNoteLock", index);
+  },
+  CLICK_UNLOCK_NOTE({ commit }, index) {
+    commit("setNoteUnLock", index);
+  },
+  CLICK_PREDICT_NOTE_LOCK({ commit }) {
+    commit("lockPredict");
+  },
+  START_CAMERA({ commit }) {
+    commit("startCam");
+  },
+  START_NOTE_CAMERA({ commit }, index) {
+    commit("startNoteCam", index);
+  },
+  END_CAMERA({ commit }, index) {
+    commit("endCam", index);
   },
 };

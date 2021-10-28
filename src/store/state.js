@@ -1,7 +1,7 @@
 export default {
   categorys: ["기본", "To-do List"], // 카테고리 종류
-  categoryModal: false, // 카테고리 수정 모달
-  selectedCategory: "", // 필터링 되는 카테고리
+  isCategoryModalShow: false, // 카테고리 수정 모달
+  selectedCategory: "전체", // 필터링 되는 카테고리
   categoryMain: false,
 
   imgUrl: null, // 이미지 url
@@ -9,6 +9,10 @@ export default {
   imgFile: null, // 해당 이미지 파일 객체 담는 변수
   fileReader: null, // 해당 이미지 파일 객체
   themes: ["#F4CCCC", "#EB9F9F", "#E7D9E7", "#FFF2CC", "#F2F2F2"], // 노트의 색상 종류
+
+  model: null,
+  webcam: null,
+  predictedLock: null,
 
   notes: [
     {
@@ -30,11 +34,11 @@ export default {
       imgPath: "", // 노트 이미지 주소
       contentModal: false, // 노트 내용 지우기 모달
       isLock: false, // 노트가 잠겼는지
-      lock_answer: false,
-      lock_value: "",
-      webCamStart: false,
-      lock_modal: false,
-      filename: "",
+      lockAnswer: false, // ?
+      lockValue: "", // 잠금 비번
+      webCamStart: false, // 캠이 시작헀는지
+      isLockModal: false, // 잠금 모달 열렸는가
+      filename: "", // ?
       predictedImage: "", // 인식된 이미지
       imgComment: "인식하지 못하였습니다.", // ?
       translatedText: "", // 번역될 텍스트
@@ -59,10 +63,10 @@ export default {
       imgPath: "",
       contentModal: false,
       isLock: false,
-      lock_answer: false,
-      lock_value: "",
+      lockAnswer: false,
+      lockValue: "",
       webCamStart: false,
-      lock_modal: false,
+      isLockModal: false,
       filename: "",
       predictedImage: "",
       imgComment: "인식하지 못하였습니다.",
