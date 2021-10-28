@@ -3,9 +3,8 @@
 
 <b>2020 오픈소스 프로젝트 - 노트 웹 애플리케이션</b>
 - 교육: 2020년 2학기
-- <img src="https://img.shields.io/badge/Python-3766AB?style=flat-square&logo=Python&logoColor=white"/></a>&nbsp 
-- Tensorflow.js
-- Node.js
+<img src="https://img.shields.io/badge/Python-#4FC08D?style=flat-square&logo=Vue&logoColor=white"/></a>&nbsp 
+
 
 ```
 Vue.js를 기반으로 한 노트 웹 애플리케이션 만들기
