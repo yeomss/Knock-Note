@@ -1,4 +1,8 @@
 export default {
+  // 노트 추가
+  CLICK_ADD_NOTE({ commit }, data) {
+    commit("addNote", data);
+  },
   // 노트 삭제
   CLICK_DELETE_NOTE({ commit }, index) {
     commit("deleteNote", index);

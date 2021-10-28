@@ -12,8 +12,10 @@ export default {
   addCategory(state, category) {
     state.categorys.push(category);
   },
-  setSelectedCategory(state, category) {
-    state.selectedCategory = category;
+
+  // 노트 추가
+  addNote(state, data) {
+    state.notes.push(data);
   },
 
   // 노트 삭제

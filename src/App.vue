@@ -27,30 +27,23 @@
 
       <hr class="part-line" />
 
-      <div class="note-part">
-        <tr
-          v-for="(note, index) in notesFilter(selectedCategory, search)"
-          v-show="!note.isFavorite"
-          :key="`note-${index}`"
-          class="note"
-          :style="{ 'background-color': note.theme }"
-        >
-          <div v-if="!note.isLock">
-            <pure-view :index="index" :note="note"></pure-view>
-          </div>
-          <div v-else>
-            <unlock-note :index="index" :note="note"></unlock-note>
-          </div>
-          <div class="note-lock-layer" v-show="note.webCamStart"></div>
-        </tr>
-      </div>
-
-      <note-editor
-        class="note-editor-container"
-        v-if="editorOpen"
-        @noteAdded="newNote"
-        @noteDeleted="deleteNote"
+      <tr
+        v-for="(note, index) in notesFilter(selectedCategory, search)"
+        v-show="!note.isFavorite"
+        :key="`note-${index}`"
+        class="note"
+        :style="{ 'background-color': note.theme }"
       >
+        <div v-if="!note.isLock">
+          <pure-view :index="index" :note="note"></pure-view>
+        </div>
+        <div v-else>
+          <unlock-note :index="index" :note="note"></unlock-note>
+        </div>
+        <div class="note-lock-layer" v-show="note.webCamStart"></div>
+      </tr>
+
+      <note-editor class="note-editor-container" v-if="editorOpen">
       </note-editor>
 
       <button class="add-btn">
@@ -80,10 +73,11 @@ export default {
   name: "App",
   data: function () {
     return {
-      notes: null, // 해당 노트들
+      notes: this.$store.state.notes, // 해당 노트들
+      categorys: this.$store.state.categorys, // 카테고리들
+
       model: null, // 모델
       selectedCategory: "",
-      categorys: null,
       editorOpen: false, // 노트 생성기가 열렸는지
 
       search: "",
@@ -93,12 +87,18 @@ export default {
     };
   },
 
-  async created() {
-    localStorage.setItem("notes", JSON.stringify(this.$store.state.notes));
+  created() {
+    // localStorage.setItem("notes", this.$store.state.notes);
     localStorage.setItem(
       "categorys",
       JSON.stringify(this.$store.state.categorys)
     );
+    if (localStorage.getItem("notes")) {
+      this.notes = JSON.parse(localStorage.getItem("notes"));
+    }
+    if (localStorage.getItem("categorys")) {
+      this.categorys = JSON.parse(localStorage.getItem("categorys"));
+    }
   },
 
   async mounted() {
@@ -116,74 +116,9 @@ export default {
       let maxPredictions = this.model.getTotalClasses();
       this.$store.state.model = this.model;
     }
-
-    if (localStorage.getItem("categorys")) {
-      this.categorys = JSON.parse(localStorage.getItem("categorys"));
-    }
   },
 
   methods: {
-    newNote(
-      category,
-      nickname,
-      title,
-      text,
-      theme,
-      time,
-      favorite,
-      is_show,
-      Todo,
-      checked,
-      listCount,
-      is_bold,
-      is_under,
-      is_incli,
-      img_path,
-      contentModal,
-      lock,
-      lock_answer,
-      lock_value,
-      webCamStart,
-      predicted,
-      lock_modal,
-      img_comment,
-      filename,
-      emotion,
-      translate,
-      translate_modal
-    ) {
-      this.notes.push({
-        category: category,
-        nickname: nickname,
-        title: title,
-        text: text,
-        theme: theme,
-        time: time,
-        favorite: favorite,
-        is_show: is_show,
-        Todo: Todo,
-        checked: checked,
-        listCount: listCount,
-        is_bold: is_bold,
-        is_under: is_under,
-        is_incli: is_incli,
-        img_path: img_path,
-        contentModal: contentModal,
-        lock: lock,
-        lock_answer: lock_answer,
-        lock_value: lock_value,
-        webCamStart: webCamStart,
-        predicted: predicted,
-        lock_modal: lock_modal,
-        img_comment: img_comment,
-        filename: filename,
-        emotion: emotion,
-        translate: translate,
-        translate_modal: translate_modal,
-      });
-      this.editorOpen = false;
-    },
-
     notesFilter(category, search) {
       console.log("하이루: ", category);
 
@@ -213,7 +148,7 @@ export default {
     },
     categorys: {
       handler() {
-        var addCategorys = this.categorys;
+        var addCategorys = this.$store.state.categorys;
         localStorage.setItem("categorys", JSON.stringify(addCategorys));
       },
     },

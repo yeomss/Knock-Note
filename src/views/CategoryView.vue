@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="category">
     <!-- 카테고리 수정 버튼 -->
     <button
       class="category-edit"
@@ -14,7 +14,7 @@
       <div>
         <div class="category-modal-content">
           <div
-            v-for="(list, index) in this.$store.state.categorys"
+            v-for="(list, index) in categorys"
             :key="`list-${index}`"
             class="category"
           >
@@ -42,8 +42,15 @@ import CategoryAdd from "../components/CategoryAdd.vue";
 export default {
   data() {
     return {
+      categorys: null,
       categoryMain: this.$store.state.categoryMain,
     };
+  },
+
+  created() {
+    if (localStorage.getItem("categorys")) {
+      this.categorys = JSON.parse(localStorage.getItem("categorys"));
+    }
   },
 
   methods: {
@@ -60,6 +67,16 @@ export default {
       this.$store.dispatch("CLICK_ADD_CATEGORY", category);
     },
   },
+
+  watch: {
+    categorys: {
+      handler() {
+        var addCategorys = this.$store.state.categorys;
+        localStorage.setItem("categorys", JSON.stringify(addCategorys));
+      },
+    },
+  },
+
   components: {
     CategoryAdd,
   },

@@ -98,8 +98,15 @@ export default {
 
   data() {
     return {
-      categorys: this.$store.state.categorys,
+      categorys: null,
     };
+  },
+
+  created() {
+    this.categorys = JSON.parse(localStorage.getItem("categorys"));
+  },
+  mouted() {
+    this.categorys = JSON.parse(localStorage.getItem("categorys"));
   },
 
   components: {

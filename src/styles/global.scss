@@ -424,6 +424,7 @@ textarea {
   cursor: default;
   grid-row-end: span 1;
   transition: 0.2s;
+  margin-top: 40px;
   // grid-row-end: 1;
   // grid-row-start: 1;
   // grid-column-start: 1;
@@ -1193,8 +1194,8 @@ textarea {
 }
 
 .note-favorite {
-  padding-top: 20px;
-  padding-bottom: 4px;
+  // padding-top: 20px;
+  padding-bottom: 20px;
   margin-bottom: 0px;
   width: 100%;
 }
@@ -1231,9 +1232,7 @@ textarea {
 // .favorite-part {
 // }
 
-.note-part {
-  margin-bottom: 30px;
-}
+
 
 #plus {
   transition: 0.3s;

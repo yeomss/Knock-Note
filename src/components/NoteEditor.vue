@@ -80,7 +80,7 @@
 
       <div class="note-editor-bottom">
         <div v-if="isLock === true && lockValue === null" />
-        <button v-else @click="createNew" class="fas fas-check-circle">
+        <button v-else @click="newNote" class="fas fas-check-circle">
           <i class="fas fa-check-circle"></i>
         </button>
       </div>
@@ -106,6 +106,7 @@ export default {
       time: moment().format("YYYY-MM-DD ddd"),
 
       checkBoxAdd: 0,
+      toDo: [],
       toDoList: [],
 
       isBold: false,
@@ -153,62 +154,20 @@ export default {
         translatedText: "",
         translateModal: false,
       };
-
-      this.$store.state.notes.push(data);
+      this.$store.dispatch("CLICK_ADD_NOTE", data);
     },
 
-    createNew() {
-      this.$emit(
-        "noteAdded",
-        this.category,
-        this.user,
-        this.title,
-        this.text,
-        this.theme,
-        this.time,
-        this.isFavorite,
-        this.toDoList,
-        this.checkBoxAdd,
-        this.isBold,
-        this.isUnder,
-        this.isIncli,
-        this.isLock,
-        this.lockAnswer,
-        this.lockValue,
-        this.webCamStart,
-        this.emotion
-      );
-
-      this.category = "기본";
-      this.user = "user";
-      this.title = "";
-      this.text = "";
-      this.theme = "#F4CCCC";
-      this.time = moment().format("YYYY-MM-DD ddd");
-      this.isFavorite = false;
-      this.isBold = false;
-      this.isUnder = false;
-      this.isIncli = false;
-      this.lockValue = "";
-      this.emotion = "NoteKnock";
-    },
-    deleteNote(index) {
-      this.$emit("noteDeleted", index);
-    },
-    addCategory(category) {
-      this.categorylist.push(category);
-      this.category = category;
-      this.categorylist = !this.categorylist;
-    },
     addList(todo, checked) {
-      this.Todo.push(todo);
-      this.TodoList.push(checked);
+      this.toDo.push(todo);
+      this.toDoList.push(checked);
     },
+
     speech_to_text() {
       var recognition = new (window.SpeechRecognition ||
         window.webkitSpeechRecognition ||
         window.mozSpeechRecognition ||
         window.msSpeechRecognition)();
+
       recognition.lang = "ko-KR";
       recognition.interimResults = false;
       recognition.maxAlternatives = 5;
@@ -225,6 +184,7 @@ export default {
       };
     },
   },
+
   components: {
     categoryadd: categoryadd,
     TodoList: TodoList,
