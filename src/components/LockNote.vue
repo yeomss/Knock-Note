@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="lock-btn">
     <span v-if="note.category != 'To-do List'">
       <button class="lockBtn" @click="lockModal(index)">
         노트 잠금

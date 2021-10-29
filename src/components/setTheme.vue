@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="theme-btn">
     <span class="note-color" @click="modalColor(index)">
       <i class="fas fa-palette"></i>
     </span>

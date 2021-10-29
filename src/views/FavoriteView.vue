@@ -68,7 +68,7 @@
     <set-theme :index="index" :note="note" />
 
     <!-- 이미지 업로드 -->
-    <div class="imageInputBox">
+    <div class="imageInputBox" style="margin-top: 25px;">
       <!-- 이미지 업로드란 -->
       <set-image :index="index" />
 

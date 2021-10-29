@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="emotion-btn">
     <span class="note-face">
       <i class="far fa-smile-wink" @click="predictImageEmotion(index)"></i>
     </span>

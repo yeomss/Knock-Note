@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="speak-btn">
     <span
       v-if="note.category === 'To-do List' && note.toDoChecked != true"
       class="text-to-speech"

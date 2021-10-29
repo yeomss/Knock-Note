@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="img-btn">
     <form>
       <input
         class="imageInput"
