@@ -11,6 +11,8 @@
       </option>
     </select>
     <category-view></category-view>
+
+    <!-- 노트 검색 -->
     <search-note @noteSearched="searchNote"></search-note>
 
     <!-- 즐겨찾기 부분 -->
@@ -140,6 +142,22 @@ export default {
     searchNote(search) {
       this.search = search;
       this.is_search = true;
+    },
+  },
+
+  watch: {
+    notes: {
+      handler() {
+        var newNotes = this.notes;
+        localStorage.setItem("notes", JSON.stringify(newNotes));
+      },
+      deep: true,
+    },
+    categorys: {
+      handler() {
+        var addCategorys = this.categorys;
+        localStorage.setItem("categorys", JSON.stringify(addCategorys));
+      },
     },
   },
 

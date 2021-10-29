@@ -8,7 +8,10 @@
 
     <!-- 노트 내용 삭제 -->
     <delete-note-content :index="index" :note="note" />
-    <div v-if="note.contentModal" class="contentDeleteModal">
+    <div
+      v-if="this.$store.state.notes[index].contentModal"
+      class="contentDeleteModal"
+    >
       노트 내용 삭제
     </div>
 
@@ -33,7 +36,10 @@
     <!-- 노트 파파고 -->
     <translate-note :index="index" />
     <transition name="bounce">
-      <div v-show="note.translateModal" class="translateModal">
+      <div
+        v-show="this.$store.state.notes[index].translateModal"
+        class="translateModal"
+      >
         {{ note.translatedText }}
       </div>
     </transition>
@@ -45,7 +51,7 @@
     <to-do-note-view v-if="note.category === 'To-do List'" :note="note" />
 
     <!-- v-else 텍스트 효과 -->
-    <text-deco-view v-else :note="note" />
+    <text-deco-view v-else :index="index" :note="note" />
     <hr />
     <set-text-deco :index="index" :note="note" />
 
@@ -99,6 +105,22 @@ export default {
   methods: {
     changeNoteCategory() {
       console.log("카테고리 변경");
+    },
+  },
+
+  watch: {
+    notes: {
+      handler() {
+        var newNotes = this.$store.state.notes;
+        localStorage.setItem("notes", JSON.stringify(newNotes));
+      },
+      deep: true,
+    },
+    categorys: {
+      handler() {
+        var addCategorys = this.$store.state.categorys;
+        localStorage.setItem("categorys", JSON.stringify(addCategorys));
+      },
     },
   },
 

@@ -1,7 +1,7 @@
 <template>
   <div>
     <textarea
-      v-if="note.isBold"
+      v-if="this.$store.state.notes[index].isBold"
       style="font-weight: bold;"
       class="note-textarea"
       rows="9"
@@ -9,7 +9,7 @@
       placeholder="Take a note..."
     ></textarea>
     <textarea
-      v-else-if="note.isUnder"
+      v-else-if="this.$store.state.notes[index].isUnder"
       style="text-decoration: underline;"
       class="note-textarea"
       rows="9"
@@ -17,7 +17,7 @@
       placeholder="Take a note..."
     ></textarea>
     <textarea
-      v-else-if="note.isIncli"
+      v-else-if="this.$store.state.notes[index].isIncli"
       style="fontstyle: italic;"
       class="note-textarea"
       rows="9"
@@ -36,7 +36,7 @@
 
 <script>
 export default {
-  props: ["note"],
+  props: ["index", "note"],
 };
 </script>
 

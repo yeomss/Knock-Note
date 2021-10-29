@@ -31,27 +31,43 @@ export default {
 
   // 내용 삭제
   deleteNoteContent(state, index) {
+    state.notes = JSON.parse(localStorage.getItem("notes"));
     state.notes[index].text = "";
     state.notes[index].imgPath = null;
     state.notes[index].emotion = "NoteKnock";
+    localStorage.setItem("notes", JSON.stringify(state.notes));
+    state.notes = JSON.parse(localStorage.getItem("notes"));
   },
   deleteContentModalIn(state, index) {
+    state.notes = JSON.parse(localStorage.getItem("notes"));
     state.notes[index].contentModal = true;
+    localStorage.setItem("notes", JSON.stringify(state.notes));
+    state.notes = JSON.parse(localStorage.getItem("notes"));
   },
   deleteContentModalOut(state, index) {
+    state.notes = JSON.parse(localStorage.getItem("notes"));
     state.notes[index].contentModal = false;
+    localStorage.setItem("notes", JSON.stringify(state.notes));
+    state.notes = JSON.parse(localStorage.getItem("notes"));
   },
 
   // 즐겨찾기
   addFavorite(state, index) {
+    state.notes = JSON.parse(localStorage.getItem("notes"));
     state.notes[index].isFavorite = true;
+    localStorage.setItem("notes", JSON.stringify(state.notes));
+    state.notes = JSON.parse(localStorage.getItem("notes"));
   },
   deleteFavorite(state, index) {
+    state.notes = JSON.parse(localStorage.getItem("notes"));
     state.notes[index].isFavorite = false;
+    localStorage.setItem("notes", JSON.stringify(state.notes));
+    state.notes = JSON.parse(localStorage.getItem("notes"));
   },
 
   // 노트 번역
   translateNote(state, index) {
+    state.notes = JSON.parse(localStorage.getItem("notes"));
     state.notes[index].translateModal = !state.notes[index].translateModal;
 
     var url = "http://127.0.0.1:3001/translate";
@@ -61,6 +77,9 @@ export default {
       state.notes[index].translatedText =
         res.data["message"]["result"].translatedText;
     });
+
+    localStorage.setItem("notes", JSON.stringify(state.notes));
+    state.notes = JSON.parse(localStorage.getItem("notes"));
   },
 
   // 이미지 인식
@@ -81,13 +100,22 @@ export default {
 
   // 텍스트 효과
   setBold(state, index) {
+    state.notes = JSON.parse(localStorage.getItem("notes"));
     state.notes[index].isBold = !state.notes[index].isBold;
+    localStorage.setItem("notes", JSON.stringify(state.notes));
+    state.notes = JSON.parse(localStorage.getItem("notes"));
   },
   setUnderbar(state, index) {
+    state.notes = JSON.parse(localStorage.getItem("notes"));
     state.notes[index].isUnder = !state.notes[index].isUnder;
+    localStorage.setItem("notes", JSON.stringify(state.notes));
+    state.notes = JSON.parse(localStorage.getItem("notes"));
   },
   setInclination(state, index) {
+    state.notes = JSON.parse(localStorage.getItem("notes"));
     state.notes[index].isIncli = !state.notes[index].isIncli;
+    localStorage.setItem("notes", JSON.stringify(state.notes));
+    state.notes = JSON.parse(localStorage.getItem("notes"));
   },
 
   // 음성인식

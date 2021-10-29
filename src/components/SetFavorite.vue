@@ -1,7 +1,7 @@
 <template>
   <!-- 즐겨찾기 해제 -->
   <span class="favorites">
-    <i class="fas fa-star" @click="addFavorite(index)"></i>
+    <i class="far fa-star" @click="addFavorite(index)"></i>
   </span>
 </template>
 
