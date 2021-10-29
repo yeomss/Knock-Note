@@ -3,17 +3,14 @@
 
 <div align='center'>
 <h3><b>2020 오픈소스프로젝트 - Note Knock</b></h3>
-
+🚩 https://osp20-25073.web.app
+<h6>노트 웹 애플리케이션</h6>
+<p>👉 팀 안녕하세염</p>
+  
 <img src="https://img.shields.io/badge/Vue.js-4FC08D?style=flat-square&logo=Vue.js&logoColor=white"/></a>
 <img src="https://img.shields.io/badge/HTML-E34F26?style=flat-square&logo=HTML5&logoColor=white"/></a>
 <img src="https://img.shields.io/badge/CSS-1572B6?style=flat-square&logo=CSS3&logoColor=white"/></a>
 <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=Node.js&logoColor=white"/></a>
-
-🚩 https://osp20-25073.web.app
-<h6>노트 웹 애플리케이션</h6>
-<p>👉 팀 안녕하세염</p>
-
-
 
 </div>
 
