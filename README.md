@@ -10,7 +10,7 @@
 <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=Node.js&logoColor=white"/></a>
 
 🚩 https://osp20-25073.web.app
-<p>노트 웹 애플리케이션<p>
+<h6>노트 웹 애플리케이션</h6>
 <p>👉 팀 안녕하세염</p>
 
 </div>
