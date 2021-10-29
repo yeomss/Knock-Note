@@ -10,7 +10,7 @@
 <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=Node.js&logoColor=white"/></a>
 
 🚩 https://osp20-25073.web.app
-<p>TEAM 안녕하세염</p>
+<p>👉 팀 안녕하세염</p>
 
 </div>
 
