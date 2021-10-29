@@ -12,14 +12,14 @@ export default {
   data: function () {
     return {
       search: "",
-      isSearch: false,
+      is_search: false,
     };
   },
   methods: {
     SearchNote() {
-      this.$emit("noteSearched", this.search, this.isSearch);
+      this.$emit("noteSearched", this.search, this.is_search);
       this.search = "";
-      this.isSearch = false;
+      this.is_search = false;
     },
   },
 };

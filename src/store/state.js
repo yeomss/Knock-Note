@@ -1,5 +1,5 @@
 export default {
-  categorys: ["기본", "To-do List"], // 카테고리 종류
+  categorys: JSON.parse(localStorage.getItem("categorys")), // 카테고리 종류
   isCategoryModalShow: false, // 카테고리 수정 모달
   selectedCategory: "전체", // 필터링 되는 카테고리
   categoryMain: false,

@@ -52,7 +52,7 @@
     <!-- 카테고리 부분 -->
     <span class="category-form">
       <select v-model="note.category">
-        <option v-for="list in categorys" :key="list">
+        <option v-for="list in this.$store.state.categorys" :key="list">
           {{ list }}
         </option>
       </select>
@@ -96,17 +96,10 @@ import SpeakNote from "../components/SpeakNote.vue";
 export default {
   props: ["index", "note"],
 
-  data() {
-    return {
-      categorys: null,
-    };
-  },
-
-  created() {
-    this.categorys = JSON.parse(localStorage.getItem("categorys"));
-  },
-  mouted() {
-    this.categorys = JSON.parse(localStorage.getItem("categorys"));
+  methods: {
+    changeNoteCategory() {
+      console.log("카테고리 변경");
+    },
   },
 
   components: {

@@ -6,7 +6,7 @@
       v-model="category"
       placeholder="category"
     />
-    <button class="category-modal-add" @click.prevent="addCategory(category)">
+    <button class="category-modal-add" @click="addCategory(category)">
       추가
     </button>
     <button
@@ -30,14 +30,12 @@ export default {
   },
 
   methods: {
-    deleteCategory(index) {
-      this.$store.dispatch("CLICK_DELETE_CATEGORY", index);
+    modalCategory() {
+      this.$store.dispatch("CLICK_CATEGORY_MODAL");
     },
     addCategory(category) {
       this.$store.dispatch("CLICK_ADD_CATEGORY", category);
-    },
-    modalCategory() {
-      this.$store.dispatch("CLICK_CATEGORY_MODAL");
+      this.category = "";
     },
   },
 };

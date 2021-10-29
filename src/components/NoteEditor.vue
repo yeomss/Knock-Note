@@ -19,7 +19,7 @@
 
       <!-- 카테고리 설정 -->
       <select v-model="category">
-        <option v-for="list in categorys" :key="list">
+        <option v-for="list in this.$store.state.categorys" :key="list">
           {{ list }}
         </option>
         <option>사용자 추가</option>
@@ -96,8 +96,6 @@ import TodoList from "./TodoList.vue";
 export default {
   data: function () {
     return {
-      categorys: this.$store.state.categorys,
-
       category: "기본",
       user: "user",
       title: "",
@@ -155,6 +153,10 @@ export default {
         translateModal: false,
       };
       this.$store.dispatch("CLICK_ADD_NOTE", data);
+    },
+
+    addCategory(category) {
+      this.$store.dispatch("CLICK_ADD_CATEGORY", category);
     },
 
     addList(todo, checked) {

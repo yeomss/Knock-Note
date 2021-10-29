@@ -7,10 +7,16 @@ export default {
     state.isCategoryModalShow = !state.isCategoryModalShow;
   },
   deleteCategory(state, index) {
+    state.categorys = JSON.parse(localStorage.getItem("categorys"));
     state.categorys.splice(index, 1);
+    localStorage.setItem("categorys", JSON.stringify(state.categorys));
+    state.categorys = JSON.parse(localStorage.getItem("categorys"));
   },
   addCategory(state, category) {
+    state.categorys = JSON.parse(localStorage.getItem("categorys"));
     state.categorys.push(category);
+    localStorage.setItem("categorys", JSON.stringify(state.categorys));
+    state.categorys = JSON.parse(localStorage.getItem("categorys"));
   },
 
   // 노트 추가

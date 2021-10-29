@@ -14,7 +14,7 @@
       <div>
         <div class="category-modal-content">
           <div
-            v-for="(list, index) in categorys"
+            v-for="(list, index) in this.$store.state.categorys"
             :key="`list-${index}`"
             class="category"
           >
@@ -42,38 +42,16 @@ import CategoryAdd from "../components/CategoryAdd.vue";
 export default {
   data() {
     return {
-      categorys: null,
       categoryMain: this.$store.state.categoryMain,
     };
   },
 
-  created() {
-    if (localStorage.getItem("categorys")) {
-      this.categorys = JSON.parse(localStorage.getItem("categorys"));
-    }
-  },
-
   methods: {
-    // 카테고리 모달 띄우기
     modalCategory() {
       this.$store.dispatch("CLICK_CATEGORY_MODAL");
     },
-    // 카테고리 삭제하기
     deleteCategory(index) {
       this.$store.dispatch("CLICK_DELETE_CATEGORY", index);
-    },
-    // 카테고리 추가하기
-    addCategory(category) {
-      this.$store.dispatch("CLICK_ADD_CATEGORY", category);
-    },
-  },
-
-  watch: {
-    categorys: {
-      handler() {
-        var addCategorys = this.$store.state.categorys;
-        localStorage.setItem("categorys", JSON.stringify(addCategorys));
-      },
     },
   },
 

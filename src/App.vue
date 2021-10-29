@@ -1,14 +1,16 @@
 <template>
   <div id="app">
+    <!-- 헤더 부분 -->
     <header-view></header-view>
 
     <!-- 카테고리 필터 -->
     <select class="category-filter" v-model="selectedCategory">
       <option value="">전체</option>
-      <option v-for="list in categorys" :key="list"> {{ list }} </option>
+      <option v-for="list in this.$store.state.categorys" :key="list">
+        {{ list }}
+      </option>
     </select>
     <category-view></category-view>
-
     <search-note @noteSearched="searchNote"></search-note>
 
     <!-- 즐겨찾기 부분 -->
@@ -27,6 +29,7 @@
 
       <hr class="part-line" />
 
+      <!-- 본노트 부분 -->
       <tr
         v-for="(note, index) in notesFilter(selectedCategory, search)"
         v-show="!note.isFavorite"
@@ -43,9 +46,11 @@
         <div class="note-lock-layer" v-show="note.webCamStart"></div>
       </tr>
 
+      <!-- 노트 추가 : 노트 에디터 열기 -->
       <note-editor class="note-editor-container" v-if="editorOpen">
       </note-editor>
 
+      <!-- 노트 추가 버튼 -->
       <button class="add-btn">
         <i
           id="plus"
@@ -71,57 +76,56 @@ import * as cocoSSD from "@tensorflow-models/coco-ssd";
 
 export default {
   name: "App",
+
   data: function () {
     return {
-      notes: this.$store.state.notes, // 해당 노트들
-      categorys: this.$store.state.categorys, // 카테고리들
-
+      notes: null, // 해당 노트들
+      categorys: null, // 카테고리들
       model: null, // 모델
+
       selectedCategory: "",
       editorOpen: false, // 노트 생성기가 열렸는지
 
-      search: "",
-      is_search: false,
-      underbarCnt: 0,
-      inclinationCnt: 0,
+      search: "", // 서치할 내용
+      is_search: false, // 서치 했는가
     };
   },
 
+  // 초기화 과정
   created() {
-    // localStorage.setItem("notes", this.$store.state.notes);
-    localStorage.setItem(
-      "categorys",
-      JSON.stringify(this.$store.state.categorys)
-    );
-    if (localStorage.getItem("notes")) {
+    if (!localStorage.getItem("notes")) {
+      localStorage.setItem("notes", JSON.stringify(this.$store.state.notes));
       this.notes = JSON.parse(localStorage.getItem("notes"));
     }
-    if (localStorage.getItem("categorys")) {
+
+    if (!localStorage.getItem("categorys")) {
+      var categorys = ["기본", "To-do List"];
+      localStorage.setItem("categorys", JSON.stringify(categorys));
       this.categorys = JSON.parse(localStorage.getItem("categorys"));
     }
+
+    this.notes = JSON.parse(localStorage.getItem("notes"));
+    this.categorys = JSON.parse(localStorage.getItem("categorys"));
   },
 
+  // 모델 로드
   async mounted() {
     this.model = await cocoSSD.load();
 
     if (localStorage.getItem("notes")) {
-      this.notes = JSON.parse(localStorage.getItem("notes"));
-
       let baseURL = "https://teachablemachine.withgoogle.com/models/OsUYBFECF/";
       this.model = await tmImage.load(
         baseURL + "model.json",
         baseURL + "metadata.json"
       );
 
-      let maxPredictions = this.model.getTotalClasses();
       this.$store.state.model = this.model;
     }
   },
 
   methods: {
+    // 노트 카테고리 필터링
     notesFilter(category, search) {
-      console.log("하이루: ", category);
-
       return this.notes.filter((note) => {
         return (
           (note.category == category || category == "") &&
@@ -132,25 +136,10 @@ export default {
       });
     },
 
+    // 노트 검색
     searchNote(search) {
       this.search = search;
       this.is_search = true;
-    },
-  },
-
-  watch: {
-    notes: {
-      handler() {
-        var newNotes = this.notes;
-        localStorage.setItem("notes", JSON.stringify(newNotes));
-      },
-      deep: true,
-    },
-    categorys: {
-      handler() {
-        var addCategorys = this.$store.state.categorys;
-        localStorage.setItem("categorys", JSON.stringify(addCategorys));
-      },
     },
   },
 
