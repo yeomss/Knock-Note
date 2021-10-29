@@ -1,7 +1,8 @@
 # 🐥 Opensource-Project-Note-App
 ![](https://github.com/dua9920/Open-Source-Note-App/blob/main/%EC%BB%B4%ED%8F%AC%EB%84%8C%ED%8A%B8%ED%99%94%EC%A4%91/src/assets/noteKnock.png)
 
-<b>2020 오픈소스 프로젝트 - 노트 웹 애플리케이션</b>
+<div align='center'>
+<h3><b>2020 오픈소스 프로젝트 - Note Knock</b></h3>
 
 <img src="https://img.shields.io/badge/Vue.js-4FC08D?style=flat-square&logo=Vue.js&logoColor=white"/></a>
 <img src="https://img.shields.io/badge/HTML-E34F26?style=flat-square&logo=HTML5&logoColor=white"/></a>
@@ -9,7 +10,9 @@
 <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=Node.js&logoColor=white"/></a>
 
 🚩 https://osp20-25073.web.app
-- 2020년 2학기 오픈소스프로젝트 과제
+<p>2020년 2학기 팀 안녕하세염</p>
+
+</div>
 
 ```
 Vue.js를 기반으로 한 노트 웹 애플리케이션 만들기
