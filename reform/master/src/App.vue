@@ -1,7 +1,8 @@
 <template>
   <div id="app">
-    <div v-if=webcam id="cam"/><h1 v-if=webcam>This object is {{ predicted }} </h1>
-    <button @click=startCam>Cam Up!</button>
+    <img id="image" src="./assets/dog.jpg">
+    <button @click=predict> Let's predict! </button>
+    <h1> Class: {{ predicted }} </h1>
     <app-header @openEditor="editorOpen = !editorOpen"></app-header>
     <app-note-editor v-if="editorOpen" @noteAdded="newNote" @noteDeleted="deleteNote"></app-note-editor>        
     <div class="noteContainer">
@@ -19,8 +20,9 @@
 <script>
 import NoteEditor from './components/NoteEditor.vue';
 import Header from './components/Header.vue';
-import * as tf from '@tensorflow/tfjs';
-import * as tmImage from '@teachablemachine/image';
+import * as cocoSSD from '@tensorflow-models/coco-ssd'
+import * as tf from '@tensorflow/tfjs'
+let model;
 
 export default {
   name: 'App',
@@ -39,9 +41,7 @@ export default {
           theme: '#DDA0DD',
         },
       ],
-      model:null,
-      webcam:null,   
-      predicted:"",   
+      predicted:"",      
     }
   },
 	computed: {
@@ -53,32 +53,19 @@ export default {
     },
     deleteNote(index) {
       this.notes.splice(index, 1)
-    },    
-    async loop() {
-        this.webcam.update(); // update the webcam frame
-        await this.predict();
-        window.requestAnimationFrame(this.loop);
-    },   
-    async predict() {
-        // predict can take in an image, video or canvas html element
-        let prediction = await this.model.predictTopK(this.webcam.canvas,1,true);        
-        this.predicted = prediction[0].className;
     },
-    async startCam(){
-        this.webcam = new tmImage.Webcam(200,200,true);
-        await this.webcam.setup(); // request access to the webcam
-        await this.webcam.play();
-        document.getElementById("cam").appendChild(this.webcam.canvas);
-        window.requestAnimationFrame(this.loop);
-    }     
+    async predict(){
+      const img = document.getElementById("image");       
+      let tmp = await model.detect(img);      
+      this.predicted = tmp[0].class
+    }
   },
-     
-  async mounted() {    
+  async mounted() {
     if (localStorage.getItem('notes')) this.notes = JSON.parse(localStorage.getItem('notes'));
-    let baseURL = 'https://teachablemachine.withgoogle.com/models/MZ4YFQ182/';
-    this.model = await tmImage.load(baseURL+'model.json', baseURL+'metadata.json');
-    let maxPredictions = this.model.getTotalClasses();
-    console.log(maxPredictions);    
+    model = await cocoSSD.load();
+    
+    console.log("model loaded");    
+     
   },
   watch: {
     notes: {
