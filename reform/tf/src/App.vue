@@ -1,5 +1,8 @@
 <template>
   <div id="app">
+    <img id="image" src="./assets/dog.jpg">
+    <button @click=predict> Let's predict! </button>
+    <h1> Class: {{ predicted }} </h1>
     <app-header @openEditor="editorOpen = !editorOpen"></app-header>
     <app-note-editor v-if="editorOpen" @noteAdded="newNote" @noteDeleted="deleteNote"></app-note-editor>        
     <div class="noteContainer">
@@ -17,6 +20,9 @@
 <script>
 import NoteEditor from './components/NoteEditor.vue';
 import Header from './components/Header.vue';
+import * as cocoSSD from '@tensorflow-models/coco-ssd'
+import * as tf from '@tensorflow/tfjs'
+let model;
 
 export default {
   name: 'App',
@@ -34,7 +40,8 @@ export default {
           text: 'event',
           theme: '#DDA0DD',
         },
-      ],      
+      ],
+      predicted:"",      
     }
   },
 	computed: {
@@ -47,9 +54,18 @@ export default {
     deleteNote(index) {
       this.notes.splice(index, 1)
     },
+    async predict(){
+      const img = document.getElementById("image");       
+      let tmp = await model.detect(img);      
+      this.predicted = tmp[0].class
+    }
   },
-  mounted() {
+  async mounted() {
     if (localStorage.getItem('notes')) this.notes = JSON.parse(localStorage.getItem('notes'));
+    model = await cocoSSD.load();
+    
+    console.log("model loaded");    
+     
   },
   watch: {
     notes: {
