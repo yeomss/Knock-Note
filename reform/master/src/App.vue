@@ -7,28 +7,42 @@
 		<NoteEditor
 			:editorOpen="editorOpen"
 			:app="app"
+			:user="user"
+			:db="db"
+			:storage="storage"
+			:categorys="categorys"
 			@noteAdded="newNote"
 			@noteDeleted="deleteNote"
 			@editorClose="editorClose"
 		/>
 
-		<!-- 노트 목록 -->
-		<div class="noteContainer">
-			<div
-				v-for="(note, key) in notes"
-				:key="`note-${key}`"
-				class="note"
-				:style="{ 'background-color': note.theme }"
-			>
-				<div>
-					<span class="delete" @click.prevent="deleteNote(key)"
-						><i class="fas fa-times"></i
-					></span>
-					<span>{{ note.title }}</span>
-					<p class="note-text">{{ note.text }}</p>
-				</div>
-			</div>
+		<!-- 노트 부가적인 서비스 -->
+		<div class="subContainer">
+			<AppCategory
+				:app="app"
+				:db="db"
+				:user="user"
+				:categorys="categorys"
+				@changeCategory="changeCategory"
+			/>
+			<AppSearch @searchNote="searchNote" />
 		</div>
+		<hr />
+
+		<div class="contentsContainer" v-if="notes">
+			<!-- 노트 todoList -->
+			<TodoContainer :db="db" :user="user" :todos="todos" />
+			<!-- 노트 목록 -->
+			<NoteContainer
+				:notes="notes"
+				:selectedCategory="category"
+				:searchTxt="searchTxt"
+				:user="user"
+				:storage="storage"
+				@deleteNote="deleteNote"
+			/>
+		</div>
+		<Loading v-else></Loading>
 	</div>
 </template>
 
@@ -36,9 +50,16 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "firebase/auth";
 import { getDatabase, ref, onValue, remove } from "firebase/database";
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
-import NoteEditor from "./components/NoteEditor.vue";
 import AppHeader from "./components/AppHeader.vue";
+import NoteEditor from "./components/NoteEditor.vue";
+import AppCategory from "./components/AppCategory.vue";
+import AppSearch from "./components/AppSearch.vue";
+import TodoContainer from "./components/TodoContainer.vue";
+import NoteContainer from "./components/NoteContainer.vue";
+import Loading from "./components/common/Loading.vue";
 
 export default {
 	name: "App",
@@ -47,6 +68,11 @@ export default {
 	components: {
 		AppHeader,
 		NoteEditor,
+		AppCategory,
+		AppSearch,
+		NoteContainer,
+		TodoContainer,
+		Loading,
 	},
 
 	// 데이터
@@ -55,19 +81,28 @@ export default {
 			// firebase 정보
 			app: null, // firebase app
 			db: null, // firebase db
+			store: null, // firebase store
+			storage: null, // firebase storage
 			user: null, // 현재 익명 사용자 정보
 
-			editorOpen: false, // note editor toggle
 			notes: null, // db 에서 가져온 notes
+			categorys: null, // db 에서 가져온 categorys
+			todos: null,
+
+			editorOpen: false, // note editor toggle
+			category: null, // 설정한 카테고리
+			searchTxt: "", // 검색하려는 키워드
 		};
 	},
 
 	// 함수
 	methods: {
+		// 새로운 노트 생성
 		newNote(note) {
 			this.notes.push(note);
 		},
 
+		// 노트 삭제
 		deleteNote(key) {
 			// this.notes.splice(index, 1);
 			if (!confirm("노트를 삭제하시겠습니까?")) {
@@ -82,10 +117,23 @@ export default {
 			}
 		},
 
+		// 노트 에디터 닫기
 		editorClose() {
 			this.editorOpen = false;
 		},
 
+		// 노트 키워드 검색
+		searchNote(text) {
+			this.searchTxt = text;
+			console.log(this.searchTxt);
+		},
+
+		// 노트 검색 카테고리 설정
+		changeCategory(selected) {
+			this.category = selected;
+		},
+
+		// db에서 노트 가져오기
 		getNotes(db, uid) {
 			// 노트 가져오기
 			const noteRef = ref(db, "notes/" + uid);
@@ -106,8 +154,8 @@ export default {
 			// iterator 형식으로 목록을 읽어온다.
 			// onChildAdded(noteRef, (data) => {
 			// 	console.log(data.val());
-			// 	this.notes = data;
-			// 	console.log(data);
+			// 	// this.notes = data;
+			// 	// console.log(data);
 			// 	// let
 			// 	// for (var d in data.val()) {
 			// 	// 	console.log(d.text, d.title);
@@ -116,15 +164,42 @@ export default {
 			// 	// this.notes.push(data.val());
 			// });
 		},
+
+		// db에서 카테고리 가져오기
+		getCategorys(db, uid) {
+			const categoryRef = ref(db, "categorys/" + uid);
+
+			onValue(
+				categoryRef,
+				(data) => {
+					this.categorys = data.val();
+				},
+				{ onlyOnce: true }
+			);
+		},
+
+		// db 에서 to do list 가져오기
+		getTodos(db, uid) {
+			const todoRef = ref(db, "todos/" + uid);
+
+			onValue(
+				todoRef,
+				(data) => {
+					this.todos = data.val();
+					console.log(this.todos);
+				},
+				{ onlyOnce: true }
+			);
+		},
 	},
 
 	// Vue Life cycle
-	mounted() {
-		if (localStorage.getItem("notes"))
-			this.notes = JSON.parse(localStorage.getItem("notes"));
+	async mounted() {
+		// if (localStorage.getItem("notes"))
+		// 	this.notes = JSON.parse(localStorage.getItem("notes"));
 	},
 
-	created() {
+	async created() {
 		// firebase
 		const firebaseConfig = {
 			apiKey: "AIzaSyB-0Q3f-GlcQcNeGVbpso4o-JAo-BcVosc",
@@ -144,6 +219,14 @@ export default {
 		const db = getDatabase(app);
 		this.db = db;
 
+		// store 가져오기
+		const store = getFirestore();
+		this.store = store;
+
+		// storage 가져오기
+		const storage = getStorage();
+		this.storage = storage;
+
 		// 익명 인증
 		const auth = getAuth();
 
@@ -157,6 +240,10 @@ export default {
 
 					// notes 읽어오기
 					this.getNotes(db, user.uid);
+					// categorys 읽어오기
+					this.getCategorys(db, user.uid);
+					// todos 읽어오기
+					this.getTodos(db, user.uid);
 				});
 			})
 			.catch((error) => {
@@ -177,6 +264,40 @@ export default {
 					(snapshot) => {
 						const data = snapshot.val();
 						this.notes = data;
+					},
+					{ onlyOnce: true }
+				);
+			}
+		},
+
+		categorys: function () {
+			let uid = this.user.uid;
+			if (uid) {
+				// 노트 가져오기
+				const categoryRef = ref(this.db, "categorys/" + this.user.uid);
+
+				// 노트 화면에 반영하기
+				onValue(
+					categoryRef,
+					(snapshot) => {
+						this.categorys = snapshot.val();
+					},
+					{ onlyOnce: true }
+				);
+			}
+		},
+
+		todos: function () {
+			let uid = this.user.uid;
+			if (uid) {
+				// 노트 가져오기
+				const todoRef = ref(this.db, "todos/" + this.user.uid);
+
+				// 노트 화면에 반영하기
+				onValue(
+					todoRef,
+					(snapshot) => {
+						this.todos = snapshot.val();
 					},
 					{ onlyOnce: true }
 				);

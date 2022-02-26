@@ -6,6 +6,22 @@
 					<div class="note-editor">
 						<div>New Knock 👋</div>
 
+						<!-- 노트 카테고리 선택 -->
+						<div>
+							<select v-model="category">
+								<option v-for="c in categorys" :key="c">
+									{{ c }}
+								</option>
+								<option>카테고리 추가</option>
+							</select>
+
+							<AddCategory
+								v-if="category == '카테고리 추가'"
+								:db="db"
+								:user="user"
+							/>
+						</div>
+
 						<!-- 노트 테마 선택-->
 						<div class="note-theme">
 							<ul>
@@ -32,6 +48,11 @@
 							placeholder="똑똑 노트 두드립시다 📝"
 						></textarea>
 
+						<!-- 노트 이미지 -->
+						<div class="note-img">
+							<input type="file" @change="loadImg" />
+						</div>
+
 						<!-- 노트 생성 버튼-->
 						<div class="note-editor-bottom">
 							<span @click="editorClose">
@@ -50,44 +71,105 @@
 </template>
 
 <script>
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { getDatabase, push, ref } from "firebase/database";
+import { push, ref as dbRef } from "firebase/database";
+import { uploadBytes, ref, getDownloadURL } from "firebase/storage";
 import moment from "moment";
 
+import AddCategory from "./common/AddCategory.vue";
+
 export default {
-	props: ["editorOpen", "app"],
+	props: ["editorOpen", "app", "db", "user", "storage", "categorys"],
+
+	components: { AddCategory },
 
 	data: function () {
 		return {
-			db: null,
-			userInfo: null,
-
 			title: "", // 노트 제목
 			theme: "", // 노트 테마
 			text: "", // 노트 본문
 			category: "", // 카테고리
 			createDate: moment().format("YYYY-MM-DD ddd"), // 생성일자
+			img: "", // 노트 이미지 url
+			imgFile: null, // 노트 이미지 파일
+			imgUrl: "", // 노트 이미지 url
 		};
 	},
 
 	methods: {
 		// 새 노트 생성
-		createNew() {
-			// 새 노트
-			let newNote = {
-				title: this.title,
-				theme: this.theme,
-				text: this.text,
-				category: this.category,
-				createDate: this.createDate,
-			};
-
+		async createNew() {
 			// 데이터 저장
-			let uid = this.userInfo.uid;
-			push(ref(this.db, "notes/" + uid), newNote);
+			let uid = this.user.uid;
+			const imgRef = ref(this.storage, `images/${uid}/${this.img}`);
+			// 이미지 storage에 저장
+			uploadBytes(imgRef, this.imgFile)
+				.then(() => {
+					// 이미지 url 추출
+					getDownloadURL(imgRef)
+						.then((url) => {
+							this.imgUrl = url;
+
+							// 새 노트
+							let newNote = {
+								title: this.title,
+								theme: this.theme,
+								text: this.text,
+								category: this.category,
+								createDate: this.createDate,
+								img: this.img,
+								imgUrl: this.imgUrl,
+							};
+
+							push(dbRef(this.db, "notes/" + uid), newNote); // db에 노트 정보 저장
+						})
+						.catch((error) => {
+							console.log(error);
+						});
+				})
+				.catch((err) => console.log(err));
 
 			this.$emit("editorClose");
 			this.initEditor();
+		},
+
+		// 노트 이미지 로드
+		loadImg(e) {
+			// 이미지 파일 객체
+			// onChange 랑 async 랑 뭔가 같이 있으면 오류가 난다..
+			// 그래서 따로 이미지 로드하는 함수를 따로 빼둠.
+			this.imgFile = e.target.files[0];
+			this.img = this.imgFile.name;
+		},
+
+		// 노트 이미지 업로드
+		uploadImg() {
+			// 이미지 파일 저장 (착각해서 firestore를 가져옴) : 필요없는 코드들
+			// db가 아닌 firestore 에 저장
+			// const imgRef = doc(this.store, "images", this.user.uid);
+			// await setDoc(imgRef, { hi: 123 });
+			// console.log(JSON.parse(JSON.stringify(this.imgFile)));
+
+			// Create a reference to 'mountains.jpg'
+			// let imgRef = ref(storage, "images/hi.png");
+
+			let uid = this.user.uid;
+			const imgRef = ref(this.storage, `images/${uid}/${this.img}`);
+
+			// 이미지 storage에 저장
+			uploadBytes(imgRef, this.imgFile)
+				.then(() => {})
+				.catch((err) => console.log(err));
+
+			// 이미지 url 추출
+			getDownloadURL(imgRef)
+				.then((url) => {
+					console.log(typeof url);
+					console.log(url);
+					this.imgUrl = new String(url);
+				})
+				.catch((error) => {
+					console.log(error);
+				});
 		},
 
 		// 노트 삭제
@@ -109,22 +191,10 @@ export default {
 			this.theme = "";
 			this.category = "";
 			this.createDate = "";
+			this.img = "";
+			this.imgFile = "";
+			this.imgUrl = "";
 		},
-	},
-
-	created() {
-		const auth = getAuth();
-		onAuthStateChanged(auth, (user) => {
-			if (user) {
-				console.log("success");
-				this.userInfo = user;
-			} else {
-				console.log("fail");
-			}
-		});
-
-		const db = getDatabase(this.app);
-		this.db = db;
 	},
 };
 </script>

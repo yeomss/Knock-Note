@@ -21,11 +21,14 @@ export default {
 
 <style lang="scss" scoped>
 .header {
+	position: fixed;
 	display: flex;
 	align-items: center;
+	width: 100%;
+	z-index: 100; // 제일 높게
+	top: 0;
 	background: #f4cccc;
 	color: #fff;
-	margin-bottom: 50px;
 	& p {
 		font-size: 35px;
 		margin: 15px 20px;
