@@ -76,10 +76,12 @@
 				</div>
 
 				<!-- 음성 인식 -->
-				<div @click="">음성인식<span class="material-icons"> mic </span></div>
+				<div @click="voiceNote(key)">
+					음성인식<span class="material-icons"> mic </span>
+				</div>
 
 				<!-- 노트 읽기 -->
-				<div>
+				<div @click="speakNote(note.text)">
 					노트읽기
 					<span class="material-icons"> volume_up </span>
 				</div>
@@ -190,6 +192,75 @@ export default {
 						});
 				})
 				.catch((err) => console.log(err));
+		},
+
+		// 노트 음성인식
+		voiceNote(key) {
+			// 인식 객체
+			let recognition = new (window.SpeechRecognition ||
+				window.webkitSpeechRecognition ||
+				window.mozSpeechRecognition ||
+				window.msSpeechRecognition)();
+
+			recognition.lang = "ko-KR"; // 한국어 설정
+			recognition.interimResults = false; // 중간 결과를 반환하는가
+
+			// 숫자가 적을수록 발음대로 적어줌. 크다면 그에 적절한 단어 반환
+			recognition.maxAlternatives = 100;
+
+			// 인식 시작
+			recognition.start();
+			recognition.onresult = (e) => {
+				let uid = this.user.uid;
+				const updates = {};
+
+				// 음성인식 된 텍스트
+				let text =
+					this.notes[key].text + " " + e.results[0][0].transcript;
+
+				// 해당 데이터의 위치
+				updates["/notes/" + uid + "/" + key + "/text"] = text;
+
+				// 해당 데이터만 업데이트
+				update(ref(this.db), updates);
+			};
+		},
+
+		// 노트 내용 읽기
+		speakNote(text) {
+			console.log("speak");
+			// 예외 처리
+			if (
+				typeof SpeechSynthesisUtterance === "undefined" ||
+				typeof window.speechSynthesis === "undefined"
+			) {
+				alert("이 브라우저는 음성 합성을 지원하지 않습니다.");
+				return;
+			}
+
+			// 현재 읽고 있다면 초기화 하기
+			window.speechSynthesis.cancel();
+
+			// 옵션
+			let opt = { rate: 1, pitch: 1.2, lang: "ko - KR" };
+			let opt_ = opt || {};
+
+			// 읽기 객체
+			let speaker = new SpeechSynthesisUtterance();
+
+			// 목소리 종류 변경
+			// 그렇지만 한국어는 못읽고 영어만 읽음.
+			// let voices = window.speechSynthesis.getVoices();
+			// speaker.voice = voices.filter(function (voice) {
+			// 	return voice.name == "Alex";
+			// })[0];
+
+			speaker.rate = opt_.rate || 1; // 속도: 0.1 ~ 10
+			speaker.pitch = opt_.pitch || 1; // 음높이: 0 ~ 2
+			speaker.lang = opt_.lang || "ko -KR"; // 언어 설정
+			speaker.text = text; // 읽는 텍스트
+
+			window.speechSynthesis.speak(speaker);
 		},
 
 		// 노트 검색 필터링
