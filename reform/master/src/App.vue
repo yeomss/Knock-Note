@@ -210,7 +210,6 @@ export default {
 				todoRef,
 				(data) => {
 					this.todos = data.val();
-					console.log(this.todos);
 				},
 				{ onlyOnce: true }
 			);
@@ -237,7 +236,6 @@ export default {
 		// img.height = 100;
 
 		this.model = await cocoSSD.load();
-		console.log(this.model);
 
 		// let img = document.querySelector(".hihi");
 		// img.onload = async () => {

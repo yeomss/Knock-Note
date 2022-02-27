@@ -103,6 +103,8 @@ export default {
 			category: "", // 카테고리
 			createDate: moment().format("YYYY-MM-DD ddd"), // 생성일자
 			img: { isUpload: false, type: "", url: "" }, // 노트 이미지
+			translated: "", // 노트 번역
+			emotion: "", // 노트 이미지 감정 인식
 
 			// 노트 테마 색상
 			themes: ["#F4CCCC", "#EB9F9F", "#E7D9E7", "#FFF2CC", "#F2F2F2"],
@@ -123,6 +125,8 @@ export default {
 				category: this.category,
 				createDate: this.createDate,
 				img: this.img,
+				translated: "",
+				emotion: "",
 			};
 
 			push(dbRef(this.db, "notes/" + uid), newNote); // db에 노트 정보 저장
@@ -165,6 +169,8 @@ export default {
 			this.category = "";
 			this.createDate = "";
 			this.img = { isUpload: false, type: "", url: "" };
+			this.translated = "";
+			this.emotion = "";
 		},
 	},
 };
@@ -296,18 +302,5 @@ export default {
 	// flex-direction: row-reverse;
 	// align-items: flex-end;
 	// flex-wrap: wrap;
-}
-
-// 트랜지션
-.editor-enter {
-	opacity: 0;
-}
-.editor-leave-active {
-	opacity: 0;
-}
-.editor-enter .note-editor,
-.editor-leave-active .note-editor {
-	-webkit-transform: scale(1.1);
-	transform: scale(1.1);
 }
 </style>

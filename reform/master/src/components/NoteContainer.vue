@@ -49,8 +49,8 @@
 
 			<!-- 노트 서브 -->
 			<div>{{ note.createDate }} {{ note.category }}</div>
+			<div>not yet 감지 객체 : {{ detected }}</div>
 
-			<div>감지 객체 : {{ detected }}</div>
 			<!-- 노트 본문 -->
 			<div class="note-contents">
 				<!-- 노트 이미지 -->
@@ -63,12 +63,14 @@
 
 				<!-- 노트 텍스트 내용-->
 				<p class="note-text">{{ note.text }}</p>
+
+				<span>{{ note.translated }}</span>
 			</div>
 
 			<!-- 노트 버튼 기능 -->
 			<div class="note-btns">
 				<!-- 이미지 업로드 -->
-				<span class="note-img-wrapper" @click="setImgExploer(key)">
+				<div class="note-img-wrapper" @click="setImgExploer(key)">
 					<form>
 						<input
 							class="imgInput"
@@ -79,7 +81,7 @@
 						/>
 					</form>
 					<span class="material-icons"> image </span>
-				</span>
+				</div>
 
 				<!-- 음성 인식 -->
 				<span @click="voiceNote(key)">
@@ -97,10 +99,14 @@
 				</span>
 
 				<!-- 번역 -->
-				<div>번역<span class="material-icons"> g_translate </span></div>
+				<span @click="translateNote(key)">
+					<span class="material-icons"> g_translate </span>
+				</span>
 
 				<!-- 표정 인식 -->
-				<div>표정인식<span class="material-icons"> mood </span></div>
+				<div @click="detectEmotion(key)">
+					표정인식<span class="material-icons"> mood </span>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -114,6 +120,7 @@ import {
 	getDownloadURL,
 } from "firebase/storage";
 import { update, ref } from "firebase/database";
+import axios from "axios";
 
 export default {
 	props: [
@@ -131,8 +138,7 @@ export default {
 			// 노트 색상 테마들
 			themes: ["#F4CCCC", "#EB9F9F", "#E7D9E7", "#FFF2CC", "#F2F2F2"],
 
-			// 객체 탐지
-			detected: "",
+			detected: "", // 객체 탐지
 		};
 	},
 
@@ -161,6 +167,50 @@ export default {
 			} else {
 				this.detected = "감지 실패";
 			}
+		},
+
+		// 노트 사진 감정 인식
+		async detectEmotion(key) {
+			console.log("emition", key);
+
+			let url = "http://127.0.0.1:3000/face";
+			let data = { fileUrl: this.notes[key].img.url };
+
+			await axios.post(url, data).then((res) => {
+				console.log("emotion:", res.data["faces"][0]);
+
+				let emotion = res.data["faces"][0]; // 감정 인식
+				let uid = this.user.uid; // uid
+
+				const updates = {};
+
+				// 해당 데이터의 위치
+				updates["/notes/" + uid + "/" + key + "/emotion"] = emotion;
+
+				// 해당 데이터만 업데이트
+				update(ref(this.db), updates);
+			});
+		},
+
+		// 노트 번역
+		async translateNote(key) {
+			let url = "http://127.0.0.1:3001/translate";
+			let data = { query: this.notes[key].text };
+
+			await axios.post(url, data).then((res) => {
+				// 번역 내용
+				let translated = res.data["message"]["result"].translatedText;
+				let uid = this.user.uid; // uid
+
+				const updates = {};
+
+				// 해당 데이터의 위치
+				updates["/notes/" + uid + "/" + key + "/translated"] =
+					translated;
+
+				// 해당 데이터만 업데이트
+				update(ref(this.db), updates);
+			});
 		},
 
 		// 노트 테마 모달 열기
@@ -192,10 +242,13 @@ export default {
 
 		// 노트 이미지 파일 탐색기 열기
 		setImgExploer(key) {
+			console.log(key);
 			document.querySelector(`.imgInput.${key}`).click();
+			console.log(document.querySelector(`.imgInput.${key}`));
 		},
 		// 노트 이미지 설정
 		setImg(e, key) {
+			console.log(e, key);
 			// 이미지 다시 저장
 			const uid = this.user.uid;
 			let imgFile = e.target.files[0]; // 이미지 파일 객체
@@ -260,26 +313,29 @@ export default {
 			recognition.maxAlternatives = 100;
 
 			// 인식 시작
-			recognition.start();
-			recognition.onresult = (e) => {
-				let uid = this.user.uid;
-				const updates = {};
+			if (confirm("음성인식을 시작하시겠습니까?")) {
+				recognition.start();
+				recognition.onresult = (e) => {
+					let uid = this.user.uid;
+					const updates = {};
 
-				// 음성인식 된 텍스트
-				let text =
-					this.notes[key].text + " " + e.results[0][0].transcript;
+					// 음성인식 된 텍스트
+					let text =
+						this.notes[key].text + " " + e.results[0][0].transcript;
 
-				// 해당 데이터의 위치
-				updates["/notes/" + uid + "/" + key + "/text"] = text;
+					// 해당 데이터의 위치
+					updates["/notes/" + uid + "/" + key + "/text"] = text;
 
-				// 해당 데이터만 업데이트
-				update(ref(this.db), updates);
-			};
+					// 해당 데이터만 업데이트
+					update(ref(this.db), updates);
+				};
+			} else {
+				return;
+			}
 		},
 
 		// 노트 내용 읽기
 		speakNote(text) {
-			console.log("speak");
 			// 예외 처리
 			if (
 				typeof SpeechSynthesisUtterance === "undefined" ||
@@ -399,6 +455,8 @@ export default {
 	word-break: break-word;
 	cursor: pointer;
 	overflow-x: hidden;
+
+	transition: all 0.3s ease;
 
 	img {
 		width: 200px;
