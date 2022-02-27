@@ -50,10 +50,16 @@
 			<!-- 노트 서브 -->
 			<div>{{ note.createDate }} {{ note.category }}</div>
 
+			<div>감지 객체 : {{ detected }}</div>
 			<!-- 노트 본문 -->
 			<div class="note-contents">
 				<!-- 노트 이미지 -->
-				<img :src="note.img.url" />
+				<img
+					class="note-img"
+					:class="key"
+					:src="note.img.url"
+					@click="detectImg(key)"
+				/>
 
 				<!-- 노트 텍스트 내용-->
 				<p class="note-text">{{ note.text }}</p>
@@ -62,7 +68,7 @@
 			<!-- 노트 버튼 기능 -->
 			<div class="note-btns">
 				<!-- 이미지 업로드 -->
-				<div class="note-img-wrapper" @click="setImgExploer(key)">
+				<span class="note-img-wrapper" @click="setImgExploer(key)">
 					<form>
 						<input
 							class="imgInput"
@@ -73,18 +79,22 @@
 						/>
 					</form>
 					<span class="material-icons"> image </span>
-				</div>
+				</span>
 
 				<!-- 음성 인식 -->
-				<div @click="voiceNote(key)">
-					음성인식<span class="material-icons"> mic </span>
-				</div>
+				<span @click="voiceNote(key)">
+					<span class="material-icons"> mic </span>
+				</span>
 
 				<!-- 노트 읽기 -->
-				<div @click="speakNote(note.text)">
-					노트읽기
+				<span @click="speakNote(note.text)">
 					<span class="material-icons"> volume_up </span>
-				</div>
+				</span>
+
+				<!-- 이미지 객체 인식 -->
+				<span class="note-detect" :class="key" @click="detectImg(key)">
+					<span class="material-icons"> auto_fix_high </span>
+				</span>
 
 				<!-- 번역 -->
 				<div>번역<span class="material-icons"> g_translate </span></div>
@@ -106,12 +116,23 @@ import {
 import { update, ref } from "firebase/database";
 
 export default {
-	props: ["notes", "selectedCategory", "searchTxt", "db", "user", "storage"],
+	props: [
+		"notes",
+		"selectedCategory",
+		"searchTxt",
+		"db",
+		"user",
+		"storage",
+		"model",
+	],
 
 	data() {
 		return {
+			// 노트 색상 테마들
 			themes: ["#F4CCCC", "#EB9F9F", "#E7D9E7", "#FFF2CC", "#F2F2F2"],
-			filterNotes: null,
+
+			// 객체 탐지
+			detected: "",
 		};
 	},
 
@@ -119,6 +140,27 @@ export default {
 		// 노트 삭제
 		deleteNote(key) {
 			this.$emit("deleteNote", key);
+		},
+
+		// 노트 이미지 객체 인식
+		async detectImg(key) {
+			//	 cocoSSD 는 이미지 객체를 인식한다. 매개변수로 이미지 객체를 넣어야함.
+			// let noteImg = document.querySelector(`.note-img.${key}`);
+			const noteImg = new Image();
+			noteImg.src = localStorage.getItem(key);
+			noteImg.width = 300;
+			noteImg.height = 300;
+			const img = noteImg; // 이거 안하면 오류남.. 왜지??
+
+			// 객체 탐지
+			let detected = await this.model.detect(img);
+
+			// 만약 객체가 탐지가 되면
+			if (detected.length != 0) {
+				this.detected = detected[0].class;
+			} else {
+				this.detected = "감지 실패";
+			}
 		},
 
 		// 노트 테마 모달 열기
@@ -157,6 +199,15 @@ export default {
 			// 이미지 다시 저장
 			const uid = this.user.uid;
 			let imgFile = e.target.files[0]; // 이미지 파일 객체
+
+			// 파일 객체 로컬 스토리지에 저장
+			// 이거는 나중에 객체 탐지할 때 사용
+			let fr = new FileReader(); // 파일 읽기 객체
+			fr.readAsDataURL(imgFile); // url로 변경
+			fr.onload = (e) => {
+				// url로 로컬 스토리지에 저장
+				localStorage.setItem(key, e.target.result);
+			};
 
 			// 똑같은 파일이름을 사용하며 업로드 할떄는 이를 덮어쓴다.
 			// 파일 타입은 다를 수 있기 때문에 파일 타입을 알기 위하여 imgType 을 구한다.

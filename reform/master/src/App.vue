@@ -40,6 +40,7 @@
 				:user="user"
 				:db="db"
 				:storage="storage"
+				:model="model"
 				@deleteNote="deleteNote"
 			/>
 		</div>
@@ -53,6 +54,8 @@ import { getAuth, signInAnonymously, onAuthStateChanged } from "firebase/auth";
 import { getDatabase, ref, onValue, remove } from "firebase/database";
 import { getFirestore } from "firebase/firestore";
 import { getStorage, ref as storageRef, deleteObject } from "firebase/storage";
+import "@tensorflow/tfjs";
+import * as cocoSSD from "@tensorflow-models/coco-ssd";
 
 import AppHeader from "./components/AppHeader.vue";
 import NoteEditor from "./components/NoteEditor.vue";
@@ -86,13 +89,18 @@ export default {
 			storage: null, // firebase storage
 			user: null, // 현재 익명 사용자 정보
 
+			// db 에서 가져온 데이터
 			notes: null, // db 에서 가져온 notes
 			categorys: null, // db 에서 가져온 categorys
 			todos: null,
 
+			// 데이터
 			editorOpen: false, // note editor toggle
 			category: null, // 설정한 카테고리
 			searchTxt: "", // 검색하려는 키워드
+
+			// 객체 탐지
+			model: null,
 		};
 	},
 
@@ -220,6 +228,24 @@ export default {
 	async mounted() {
 		// if (localStorage.getItem("notes"))
 		// 	this.notes = JSON.parse(localStorage.getItem("notes"));
+		// 객체 탐지 모델 로드
+		// let img = new Image();
+		// let url = "https://newsimg.sedaily.com/2021/12/09/22V85NTJGY_1.jpg";
+		// img.crossOrigin = "Anonymous";
+		// img.src = "./assets/dog.jpg";
+		// img.width = 100;
+		// img.height = 100;
+
+		this.model = await cocoSSD.load();
+		console.log(this.model);
+
+		// let img = document.querySelector(".hihi");
+		// img.onload = async () => {
+		// 	console.log(img);
+		// 	this.model = await cocoSSD.load();
+		// 	let tmp = await this.model.detect(img);
+		// 	console.log(tmp);
+		// };
 	},
 
 	async created() {
