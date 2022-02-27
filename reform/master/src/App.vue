@@ -27,17 +27,18 @@
 			/>
 			<AppSearch @searchNote="searchNote" />
 		</div>
-		<hr />
 
 		<div class="contentsContainer" v-if="notes">
 			<!-- 노트 todoList -->
 			<TodoContainer :db="db" :user="user" :todos="todos" />
+			<hr />
 			<!-- 노트 목록 -->
 			<NoteContainer
 				:notes="notes"
 				:selectedCategory="category"
 				:searchTxt="searchTxt"
 				:user="user"
+				:db="db"
 				:storage="storage"
 				@deleteNote="deleteNote"
 			/>
@@ -51,7 +52,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "firebase/auth";
 import { getDatabase, ref, onValue, remove } from "firebase/database";
 import { getFirestore } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
+import { getStorage, ref as storageRef, deleteObject } from "firebase/storage";
 
 import AppHeader from "./components/AppHeader.vue";
 import NoteEditor from "./components/NoteEditor.vue";
@@ -105,13 +106,28 @@ export default {
 		// 노트 삭제
 		deleteNote(key) {
 			// this.notes.splice(index, 1);
+
+			let uid = this.user.uid;
 			if (!confirm("노트를 삭제하시겠습니까?")) {
 				return;
 			} else {
-				const noteRef = ref(
-					this.db,
-					"notes/" + this.user.uid + "/" + key
-				);
+				// storage에서 삭제
+				if (this.notes[key].img.isUpload) {
+					const imgType = this.notes[key].img.type;
+					let path = `images/${uid}/${key}/noteImage.${imgType}`;
+					const imgRef = storageRef(this.storage, path);
+
+					deleteObject(imgRef)
+						.then(() => {
+							console.log("파일 삭제 완료!");
+						})
+						.catch((error) => {
+							console.log(error);
+						});
+				}
+
+				// db에서 삭제
+				const noteRef = ref(this.db, "notes/" + uid + "/" + key);
 				remove(noteRef);
 				delete this.notes[key];
 			}
@@ -191,6 +207,13 @@ export default {
 				{ onlyOnce: true }
 			);
 		},
+
+		setHrTag() {
+			let browserHeight = window.innerHeight - 200;
+			let hrTag = document.querySelector(".contentsContainer hr");
+			let hrStyle = hrTag.style;
+			hrStyle.height = browserHeight + "px";
+		},
 	},
 
 	// Vue Life cycle
@@ -251,6 +274,7 @@ export default {
 			});
 	},
 
+	// vue watch
 	watch: {
 		notes: function () {
 			let uid = this.user.uid;
@@ -309,4 +333,6 @@ export default {
 
 <style lang="scss">
 @import "/styles/global.scss";
+@import "/styles/mobile.scss";
+@import "/styles/pad.scss";
 </style>

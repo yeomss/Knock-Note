@@ -1,0 +1,21 @@
+@media only screen and (min-device-width: 320px) and (max-device-width: 480px) {
+	.todoToggle {
+		display: block;
+		background-color: tan;
+	}
+
+	.contentsContainer {
+		background-color: aqua;
+		display: flex;
+		flex-direction: column;
+
+		.todoContainer {
+			width: 100%;
+		}
+
+		.noteContainer {
+			width: 100%;
+			background-color: teal;
+		}
+	}
+}

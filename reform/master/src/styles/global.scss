@@ -1,5 +1,6 @@
 html {
 	box-sizing: border-box;
+	height: 100%;
 }
 
 *,
@@ -17,6 +18,7 @@ body {
 	color: #654b52;
 	margin: 0;
 	padding-top: 76px;
+	height: 100%;
 }
 
 ::placeholder {
@@ -30,7 +32,12 @@ body {
 }
 
 .shadow {
-	box-shadow: 0 0.5rem 1rem rgba(235, 159, 159, 0.664);
+	// box-shadow: 5px 10px 10px rgba(0, 0, 0, 0.03);
+	// box-shadow: 5px 10px 10px rgba(235, 159, 159, 0.05);
+	// box-shadow: 5px 10px 7px rgba(235, 159, 159, 0.1);
+	box-shadow: 0 2px 2px rgba(235, 159, 159, 0.05),
+		0 4px 4px rgba(235, 159, 159, 0.05), 0 8px 8px rgba(235, 159, 159, 0.05),
+		0 16px 16px rgba(235, 159, 159, 0.05);
 }
 
 // note editor open btn
@@ -61,16 +68,14 @@ body {
 .contentsContainer {
 	display: flex;
 	flex-direction: row;
-	// align-items: stretch;
-	justify-content: space-around;
-	// justify-content: center;
-	background-color: tan;
+	flex-wrap: nowrap;
+	align-items: flex-start;
 }
-.todoContainer {
-	// flex-grow: 1;
+.todoToggle {
+	display: none;
 }
 .noteContainer {
-	// flex-grow: 3;
+	width: 100%;
 }
 
 .delete {

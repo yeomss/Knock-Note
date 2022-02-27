@@ -1,33 +1,94 @@
 <template>
 	<div class="noteContainer">
 		<!-- <div @click="temp">하이루</div> -->
-
 		<div
 			v-for="(note, key) in notes"
 			:key="`note-${key}`"
-			class="note"
-			:style="{ 'background-color': note.theme }"
+			class="note shadow"
+			:style="{ 'background-color': note.theme.theme }"
 		>
-			<div>
-				<!-- 삭제 버튼 -->
-				<span class="delete" @click.prevent="deleteNote(key)">
-					<i class="fas fa-times"></i>
-				</span>
+			<!-- 노트 제목 -->
+			<span>{{ note.title }}</span>
 
-				<!-- 노트 제목 -->
-				<span>{{ note.title }}</span>
+			<!-- 삭제 버튼 -->
+			<span class="delete" @click.prevent="deleteNote(key)">
+				<i class="fas fa-times"></i>
+			</span>
 
-				<!-- 노트 서브 -->
-				<div>{{ note.createDate }} {{ note.category }}</div>
+			<!-- 노트 테마 -->
+			<span
+				class="material-icons"
+				@click="noteThemeOpen(key, note.theme)"
+			>
+				palette
+			</span>
+			<span v-show="note.theme.isOpen" class="note-theme-modal">
+				<ul>
+					<li
+						class="theme1 shadow"
+						@click="setTheme(key, themes[0])"
+					></li>
+					<li
+						class="theme2 shadow"
+						@click="setTheme(key, themes[1])"
+					></li>
+					<li
+						class="theme3 shadow"
+						@click="setTheme(key, themes[2])"
+					></li>
+					<li
+						class="theme4 shadow"
+						@click="setTheme(key, themes[3])"
+					></li>
+					<li
+						class="theme5 shadow"
+						@click="setTheme(key, themes[4])"
+					></li>
+				</ul>
+			</span>
 
+			<!-- 노트 서브 -->
+			<div>{{ note.createDate }} {{ note.category }}</div>
+
+			<!-- 노트 본문 -->
+			<div class="note-contents">
 				<!-- 노트 이미지 -->
-				<div>이미지 <img :src="note.imgUrl" />{{ note.imgUrl }}</div>
+				<img :src="note.img.url" />
 
-				<!-- 노트 본문-->
+				<!-- 노트 텍스트 내용-->
 				<p class="note-text">{{ note.text }}</p>
+			</div>
 
-				<!-- 노트 테마 -->
-				<div>노트테마{{ note.theme }}</div>
+			<!-- 노트 버튼 기능 -->
+			<div class="note-btns">
+				<!-- 이미지 업로드 -->
+				<div class="note-img-wrapper" @click="setImgExploer(key)">
+					<form>
+						<input
+							class="imgInput"
+							:class="key"
+							type="file"
+							accept="image/*"
+							@change="setImg($event, key)"
+						/>
+					</form>
+					<span class="material-icons"> image </span>
+				</div>
+
+				<!-- 음성 인식 -->
+				<div @click="">음성인식<span class="material-icons"> mic </span></div>
+
+				<!-- 노트 읽기 -->
+				<div>
+					노트읽기
+					<span class="material-icons"> volume_up </span>
+				</div>
+
+				<!-- 번역 -->
+				<div>번역<span class="material-icons"> g_translate </span></div>
+
+				<!-- 표정 인식 -->
+				<div>표정인식<span class="material-icons"> mood </span></div>
 			</div>
 		</div>
 	</div>
@@ -35,13 +96,19 @@
 
 <script>
 // import { doc, getDoc } from "firebase/firestore";
-// import { ref } from "firebase/storage";
+import {
+	ref as StorageRef,
+	uploadBytes,
+	getDownloadURL,
+} from "firebase/storage";
+import { update, ref } from "firebase/database";
 
 export default {
-	props: ["notes", "selectedCategory", "searchTxt", "user", "storage"],
+	props: ["notes", "selectedCategory", "searchTxt", "db", "user", "storage"],
 
 	data() {
 		return {
+			themes: ["#F4CCCC", "#EB9F9F", "#E7D9E7", "#FFF2CC", "#F2F2F2"],
 			filterNotes: null,
 		};
 	},
@@ -50,6 +117,79 @@ export default {
 		// 노트 삭제
 		deleteNote(key) {
 			this.$emit("deleteNote", key);
+		},
+
+		// 노트 테마 모달 열기
+		noteThemeOpen(key, theme) {
+			let uid = this.user.uid; // uid
+			let isOpen = !theme.isOpen; // 해당 노트의 테마 모달 토글
+
+			const updates = {};
+
+			// 해당 데이터의 위치
+			updates["/notes/" + uid + "/" + key + "/theme/isOpen"] = isOpen;
+
+			// 해당 데이터만 업데이트
+			update(ref(this.db), updates);
+		},
+		// 노트 테마 설정
+		setTheme(key, theme) {
+			let uid = this.user.uid; // uid
+			let newTheme = theme;
+
+			const updates = {};
+
+			// 해당 데이터의 위치
+			updates["/notes/" + uid + "/" + key + "/theme/theme"] = newTheme;
+
+			// 해당 데이터만 업데이트
+			update(ref(this.db), updates);
+		},
+
+		// 노트 이미지 파일 탐색기 열기
+		setImgExploer(key) {
+			document.querySelector(`.imgInput.${key}`).click();
+		},
+		// 노트 이미지 설정
+		setImg(e, key) {
+			// 이미지 다시 저장
+			const uid = this.user.uid;
+			let imgFile = e.target.files[0]; // 이미지 파일 객체
+
+			// 똑같은 파일이름을 사용하며 업로드 할떄는 이를 덮어쓴다.
+			// 파일 타입은 다를 수 있기 때문에 파일 타입을 알기 위하여 imgType 을 구한다.
+			let imgType = imgFile.type.substr(imgFile.type.indexOf("/") + 1);
+
+			// 이미지 storage에 저장
+			const imgRef = StorageRef(
+				this.storage,
+				`images/${uid}/${key}/noteImage.${imgType}`
+			);
+
+			// 이미지 storage에 업로딩 함수: uploadBytes
+			uploadBytes(imgRef, imgFile)
+				.then(() => {
+					// 업로드 완료
+					console.log("image upload success");
+					// 이미지 url 추출
+					getDownloadURL(imgRef)
+						.then((url) => {
+							const updates = {};
+
+							// 해당 데이터의 위치
+							updates["/notes/" + uid + "/" + key + "/img"] = {
+								isUpload: true,
+								type: imgType,
+								url: url,
+							};
+							// 해당 데이터만 업데이트
+							update(ref(this.db), updates);
+						})
+						.catch((error) => {
+							console.log(error);
+						});
+				})
+				.catch((err) => console.log(err));
 		},
 
 		// 노트 검색 필터링
@@ -116,34 +256,127 @@ export default {
 
 <style lang="scss" scoped>
 .noteContainer {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: center;
-	min-width: 32rem;
-	// flex-basis: 500px;
-	// width: 100%;
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+	grid-auto-flow: dense;
+	// border-left: 1px solid black;
+	height: 100%;
 }
 
 .note {
 	display: flex;
 	flex-direction: column;
 	position: relative;
-	min-width: 20rem;
-	min-height: 25rem;
-	max-height: 25rem;
+	height: 25rem;
 	background: #fff;
 	border-radius: 3px;
-	box-shadow: 0 2px 2px rgba(0, 90, 250, 0.05),
-		0 4px 4px rgba(0, 90, 250, 0.05), 0 8px 8px rgba(0, 90, 250, 0.05),
-		0 16px 16px rgba(0, 90, 250, 0.05);
+
 	box-sizing: border-box;
-	margin: 15px;
+	margin: 10px;
 	padding: 25px;
 	word-break: break-word;
 	cursor: pointer;
+	overflow-x: hidden;
 
 	img {
 		width: 200px;
 	}
+}
+
+.note-img-wrapper {
+	input[type="file"] {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		border: 0;
+	}
+}
+
+.note-theme-modal {
+	// background-color: #fff;
+	background-color: #654b52;
+
+	position: absolute;
+	width: 100%;
+	top: 0;
+	right: 0px;
+	z-index: 1;
+	// opacity: 0.6;
+	transition: 0.2s;
+	padding: 5px;
+
+	ul {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-around;
+		flex-wrap: nowrap;
+		margin: 0;
+		padding: 0;
+	}
+
+	&:hover {
+		opacity: 1;
+	}
+	li {
+		display: inline-block;
+		border-radius: 5px;
+		width: 2rem;
+		height: 2rem;
+		margin: 1px;
+		transition: 0.3s;
+		border: #000;
+		opacity: 0.7;
+		background-color: #fff;
+
+		&.theme1 {
+			background-color: #f4cccc;
+			opacity: 1;
+			&:hover {
+				opacity: 1;
+				transform: scale(1.02, 1.02);
+			}
+		}
+
+		&.theme2 {
+			background-color: #eb9f9f;
+			&:hover {
+				opacity: 1;
+				transform: scale(1.02, 1.02);
+			}
+		}
+
+		&.theme3 {
+			background-color: #e7d9e7;
+			&:hover {
+				opacity: 1;
+				transform: scale(1.02, 1.02);
+			}
+		}
+
+		&.theme4 {
+			background-color: #fff2cc;
+			&:hover {
+				opacity: 1;
+				transform: scale(1.02, 1.02);
+			}
+		}
+
+		&.theme5 {
+			background-color: #f2f2f2;
+			&:hover {
+				opacity: 1;
+				transform: scale(1.02, 1.02);
+			}
+		}
+	}
+}
+
+.note-contents {
+	overflow-y: scroll;
+	height: 100%;
 }
 </style>

@@ -3,6 +3,7 @@
 		<div class="note-editor-mask" v-if="editorOpen">
 			<div class="note-editor-container">
 				<div class="note-editor">
+					<!-- <div @click="uploadImg">load</div> -->
 					<div>New Knock 👋</div>
 
 					<!-- 노트 카테고리 선택 -->
@@ -24,11 +25,26 @@
 					<!-- 노트 테마 선택-->
 					<div class="note-theme">
 						<ul>
-							<li class="theme1"></li>
-							<li class="theme2"></li>
-							<li class="theme3"></li>
-							<li class="theme4"></li>
-							<li class="theme5"></li>
+							<li
+								class="theme1"
+								@click="setTheme(themes[0])"
+							></li>
+							<li
+								class="theme2"
+								@click="setTheme(themes[1])"
+							></li>
+							<li
+								class="theme3"
+								@click="setTheme(themes[2])"
+							></li>
+							<li
+								class="theme4"
+								@click="setTheme(themes[3])"
+							></li>
+							<li
+								class="theme5"
+								@click="setTheme(themes[4])"
+							></li>
 						</ul>
 					</div>
 
@@ -48,9 +64,9 @@
 					></textarea>
 
 					<!-- 노트 이미지 -->
-					<div class="note-img">
+					<!-- <div class="note-img">
 						<input type="file" @change="loadImg" />
-					</div>
+					</div> -->
 
 					<!-- 노트 생성 버튼-->
 					<div class="note-editor-bottom">
@@ -69,7 +85,7 @@
 
 <script>
 import { push, ref as dbRef } from "firebase/database";
-import { uploadBytes, ref, getDownloadURL } from "firebase/storage";
+// import { uploadBytes, ref, getDownloadURL } from "firebase/storage";
 import moment from "moment";
 
 import AddCategory from "./common/AddCategory.vue";
@@ -82,13 +98,14 @@ export default {
 	data: function () {
 		return {
 			title: "", // 노트 제목
-			theme: "", // 노트 테마
+			theme: { isOpen: false, theme: "#f4cccc" }, // 노트 테마
 			text: "", // 노트 본문
 			category: "", // 카테고리
 			createDate: moment().format("YYYY-MM-DD ddd"), // 생성일자
-			img: "", // 노트 이미지 url
-			imgFile: null, // 노트 이미지 파일
-			imgUrl: "", // 노트 이미지 url
+			img: { isUpload: false, type: "", url: "" }, // 노트 이미지
+
+			// 노트 테마 색상
+			themes: ["#F4CCCC", "#EB9F9F", "#E7D9E7", "#FFF2CC", "#F2F2F2"],
 		};
 	},
 
@@ -97,36 +114,26 @@ export default {
 		async createNew() {
 			// 데이터 저장
 			let uid = this.user.uid;
-			const imgRef = ref(this.storage, `images/${uid}/${this.img}`);
-			// 이미지 storage에 저장
-			uploadBytes(imgRef, this.imgFile)
-				.then(() => {
-					// 이미지 url 추출
-					getDownloadURL(imgRef)
-						.then((url) => {
-							this.imgUrl = url;
 
-							// 새 노트
-							let newNote = {
-								title: this.title,
-								theme: this.theme,
-								text: this.text,
-								category: this.category,
-								createDate: this.createDate,
-								img: this.img,
-								imgUrl: this.imgUrl,
-							};
+			// 새 노트
+			let newNote = {
+				title: this.title,
+				theme: this.theme,
+				text: this.text,
+				category: this.category,
+				createDate: this.createDate,
+				img: this.img,
+			};
 
-							push(dbRef(this.db, "notes/" + uid), newNote); // db에 노트 정보 저장
-						})
-						.catch((error) => {
-							console.log(error);
-						});
-				})
-				.catch((err) => console.log(err));
+			push(dbRef(this.db, "notes/" + uid), newNote); // db에 노트 정보 저장
 
 			this.$emit("editorClose");
 			this.initEditor();
+		},
+
+		// 노트 색상 설정
+		setTheme(theme) {
+			this.theme = { isOpen: false, theme: theme };
 		},
 
 		// 노트 이미지 로드
@@ -136,37 +143,6 @@ export default {
 			// 그래서 따로 이미지 로드하는 함수를 따로 빼둠.
 			this.imgFile = e.target.files[0];
 			this.img = this.imgFile.name;
-		},
-
-		// 노트 이미지 업로드
-		uploadImg() {
-			// 이미지 파일 저장 (착각해서 firestore를 가져옴) : 필요없는 코드들
-			// db가 아닌 firestore 에 저장
-			// const imgRef = doc(this.store, "images", this.user.uid);
-			// await setDoc(imgRef, { hi: 123 });
-			// console.log(JSON.parse(JSON.stringify(this.imgFile)));
-
-			// Create a reference to 'mountains.jpg'
-			// let imgRef = ref(storage, "images/hi.png");
-
-			let uid = this.user.uid;
-			const imgRef = ref(this.storage, `images/${uid}/${this.img}`);
-
-			// 이미지 storage에 저장
-			uploadBytes(imgRef, this.imgFile)
-				.then(() => {})
-				.catch((err) => console.log(err));
-
-			// 이미지 url 추출
-			getDownloadURL(imgRef)
-				.then((url) => {
-					console.log(typeof url);
-					console.log(url);
-					this.imgUrl = new String(url);
-				})
-				.catch((error) => {
-					console.log(error);
-				});
 		},
 
 		// 노트 삭제
@@ -185,12 +161,10 @@ export default {
 		initEditor() {
 			this.title = "";
 			this.text = "";
-			this.theme = "";
+			this.theme = { isOpen: false, theme: "#f4cccc" };
 			this.category = "";
 			this.createDate = "";
-			this.img = "";
-			this.imgFile = "";
-			this.imgUrl = "";
+			this.img = { isUpload: false, type: "", url: "" };
 		},
 	},
 };
