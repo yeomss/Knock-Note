@@ -14,7 +14,7 @@
 			@noteAdded="newNote"
 			@noteDeleted="deleteNote"
 			@editorClose="editorClose"
-		/>
+		></NoteEditor>
 
 		<!-- 노트 부가적인 서비스 -->
 		<div class="subContainer">

@@ -12,7 +12,10 @@
 		<div>
 			<ul v-for="(todo, key) in todos" :key="key">
 				<li>
-					<span>
+					<span
+						:class="{ todoCheck: todo.completed }"
+						@click="toggleTodo(todo, key)"
+					>
 						<span class="material-icons"> check </span>
 					</span>
 
@@ -27,7 +30,7 @@
 </template>
 
 <script>
-import { push, ref, remove } from "firebase/database";
+import { push, ref, remove, set } from "firebase/database";
 
 export default {
 	props: ["db", "user", "todos"],
@@ -64,6 +67,14 @@ export default {
 			remove(ref(this.db, "todos/" + uid + "/" + key));
 			delete this.todos[key];
 		},
+
+		// todo 체크
+		toggleTodo(todo, key) {
+			let uid = this.user.uid;
+			let todoRef = ref(this.db, "todos/" + uid + "/" + key);
+			let updateTodo = { completed: !todo.completed, text: todo.text };
+			set(todoRef, updateTodo);
+		},
 	},
 };
 </script>
@@ -75,5 +86,9 @@ export default {
 	margin: 15px;
 	// flex-basis: 20rem;
 	min-width: 23rem;
+}
+
+.todoCheck {
+	background-color: tomato;
 }
 </style>
