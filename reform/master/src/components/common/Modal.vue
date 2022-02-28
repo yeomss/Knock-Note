@@ -37,7 +37,7 @@ export default {
 <style lang="scss">
 .modal-mask {
 	position: fixed;
-	z-index: 100;
+	z-index: 200;
 	top: 0;
 	left: 0;
 	width: 100%;
@@ -58,6 +58,7 @@ export default {
 	margin: 0px auto;
 	padding: 20px 30px;
 	background-color: #654b52;
+	opacity: 0.9;
 	border-radius: 2px;
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
 	transition: all 0.3s ease;
@@ -76,6 +77,7 @@ export default {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-between;
+	transition: all 0.3s ease;
 
 	ul {
 		list-style-type: none;
@@ -84,7 +86,7 @@ export default {
 		// margin-top: 0.5rem;
 
 		li {
-			width: 5rem;
+			width: 100%;
 			// margin-left: 0.5rem;
 			display: flex;
 			align-items: center;

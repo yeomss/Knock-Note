@@ -669,7 +669,7 @@ export default {
 
 .noteContainer {
 	display: grid;
-	grid-template-columns: 1fr 1fr 1fr;
+	grid-template-columns: repeat(4, 1fr);
 	grid-auto-flow: dense;
 	// border-left: 1px solid black;
 	height: 100%;
@@ -873,5 +873,20 @@ export default {
 		justify-content: space-between;
 		align-items: center;
 	}
+}
+
+// 삭제 버튼
+.delete {
+	cursor: pointer;
+}
+
+/* 리스트 트랜지션 */
+.note-enter-active,
+.note-leave-active {
+	transition: all 0.35s;
+}
+.note-enter, .note-leave-to /* .list-leave-active below version 2.1.8 */ {
+	opacity: 0;
+	transform: translateY(30px) scale(1.1);
 }
 </style>

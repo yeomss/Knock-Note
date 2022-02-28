@@ -34,6 +34,7 @@
 						</span>
 					</li>
 				</ul>
+
 				<AddCategory
 					:db="db"
 					:user="user"
@@ -103,5 +104,14 @@ export default {
 		color: #eb9f9f;
 		cursor: pointer;
 	}
+}
+/* 리스트 트랜지션 */
+.list-enter-active,
+.list-leave-active {
+	transition: all 0.35s;
+}
+.list-enter, .list-leave-to /* .list-leave-active below version 2.1.8 */ {
+	opacity: 0;
+	transform: translateY(30px) scale(1.1);
 }
 </style>

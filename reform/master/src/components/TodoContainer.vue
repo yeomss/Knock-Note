@@ -30,8 +30,10 @@
 						<span
 							class="todoText"
 							:class="{ textCompleted: todo.completed }"
-							>{{ todo.text }}</span
+							@click="toggleTodo(todo, key)"
 						>
+							{{ todo.text }}
+						</span>
 
 						<span @click="deleteTodo(key)">
 							<span class="material-icons todoDelete">
@@ -174,6 +176,7 @@ li {
 	}
 	.todoText {
 		flex-grow: 1;
+		cursor: pointer;
 	}
 	.textCompleted {
 		text-decoration: line-through;
