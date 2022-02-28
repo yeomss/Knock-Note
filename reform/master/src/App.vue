@@ -35,6 +35,7 @@
 			<!-- 노트 목록 -->
 			<NoteContainer
 				:notes="notes"
+				:categorys="categorys"
 				:selectedCategory="category"
 				:searchTxt="searchTxt"
 				:user="user"
@@ -121,8 +122,8 @@ export default {
 			} else {
 				// storage에서 삭제
 				if (this.notes[key].img.isUpload) {
-					const imgType = this.notes[key].img.type;
-					let path = `images/${uid}/${key}/noteImage.${imgType}`;
+					// const imgType = this.notes[key].img.type;
+					let path = `images/${uid}/${key}/noteImage`;
 					const imgRef = storageRef(this.storage, path);
 
 					deleteObject(imgRef)

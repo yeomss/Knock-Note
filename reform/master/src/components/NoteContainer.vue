@@ -9,14 +9,26 @@
 		>
 			<!-- 노트 제목 -->
 			<div class="note-title-wrapper">
-				<div v-if="!note.title.isEdit" @click="openEditTitle(key)">
-					{{ note.title.text }}
+				<div v-if="!note.title.isEdit">
+					<textarea
+						v-if="note.title.text !== ''"
+						@click="openEditTitle(key)"
+						v-model="note.title.text"
+						rows="1"
+					>
+					</textarea>
+					<textarea
+						v-else
+						rows="1"
+						placeholder="Knock Note 👋"
+					></textarea>
 				</div>
+
 				<textarea
 					id="note-title-area"
 					v-model="editTitle"
-					v-else
 					rows="1"
+					v-else
 					@change="editNoteTitle(key)"
 					@blur="editNoteTitle(key)"
 				></textarea>
@@ -28,8 +40,18 @@
 			</span>
 
 			<!-- 노트 서브 -->
-			<div class="note-date">
-				{{ note.createDate }} {{ note.category }}
+			<div class="note-meta-wrapper">
+				<div class="note-date">
+					{{ note.createDate }}
+				</div>
+
+				<div class="note-category">
+					<select v-model="note.category">
+						<option v-for="category in categorys" :key="category">
+							{{ category }}
+						</option>
+					</select>
+				</div>
 			</div>
 
 			<!-- 노트 모달 -->
@@ -57,7 +79,12 @@
 				<!-- 노트 텍스트 내용-->
 				<div class="note-text-wrapper">
 					<div v-if="!note.text.isEdit" @click="openEditText(key)">
-						<p class="note-text" v-html="note.text.html"></p>
+						<p
+							class="note-text"
+							v-if="note.text.text != ''"
+							v-html="note.text.html"
+						></p>
+						<textarea v-else placeholder="Knock Note 👋"></textarea>
 					</div>
 					<textarea
 						type="text"
@@ -74,6 +101,7 @@
 				<span>{{ note.translated }}</span>
 			</div>
 
+			<hr class="note-line" />
 			<!-- 노트 버튼 기능 -->
 			<div class="note-btns">
 				<div class="note-btns-wrapper-1">
@@ -180,6 +208,7 @@ import NoteModal from "./common/NoteModal.vue";
 export default {
 	props: [
 		"notes",
+		"categorys",
 		"selectedCategory",
 		"searchTxt",
 		"db",
@@ -469,7 +498,7 @@ export default {
 			// 이미지 storage에 저장
 			const imgRef = StorageRef(
 				this.storage,
-				`images/${uid}/${key}/noteImage.${imgType}`
+				`images/${uid}/${key}/noteImage`
 			);
 
 			// 이미지 storage에 업로딩 함수: uploadBytes
@@ -524,9 +553,11 @@ export default {
 						this.notes[key].text.text +
 						" " +
 						e.results[0][0].transcript;
+					let htmlText = text.replace(/(\n|\r\n)/g, "<br/>");
+					let newText = { isEdit: false, text: text, html: htmlText };
 
 					// 해당 데이터의 위치
-					updates["/notes/" + uid + "/" + key + "/text/text"] = text;
+					updates["/notes/" + uid + "/" + key + "/text"] = newText;
 
 					// 해당 데이터만 업데이트
 					update(ref(this.db), updates);
@@ -673,18 +704,29 @@ export default {
 	.note-date {
 		font-size: 0.2rem;
 	}
+
+	.note-line {
+		width: 100%;
+		border: 0px;
+		height: 0.2px;
+		// background-color: #7a6a6e;
+		background-color: #654b5252;
+	}
 }
 .note-title-wrapper {
 	font-size: 1.2rem;
-	// height: 2rem;
 	cursor: pointer;
 
 	textarea {
 		font-size: 1.2rem;
-		// height: auto;
-		padding: 0;
-		margin: 0;
+		border: none;
 	}
+}
+.note-meta-wrapper {
+	background-color: tan;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 }
 .note-text-wrapper {
 	cursor: pointer;

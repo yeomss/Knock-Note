@@ -100,7 +100,7 @@ export default {
 			title: { isEdit: false, text: "" }, // 노트 제목
 			theme: { isOpen: false, theme: "#f4cccc" }, // 노트 테마
 			text: { isEdit: false, text: "", html: "" }, // 노트 본문
-			category: "", // 카테고리
+			category: "기본", // 카테고리
 			createDate: "", // 생성일자
 			img: { isUpload: false, type: "", url: "" }, // 노트 이미지
 			detected: { isOpen: false, text: "none" }, // 노트 이미지 객체 탐지
@@ -174,7 +174,7 @@ export default {
 			this.title = { isEdit: false, text: "" };
 			this.text = { isEdit: false, text: "", html: "" };
 			this.theme = { isOpen: false, theme: "#f4cccc" };
-			this.category = "";
+			this.category = "기본";
 			this.createDate = "";
 			this.img = { isUpload: false, type: "", url: "" };
 			this.detected = { isOpen: false, text: "none" };

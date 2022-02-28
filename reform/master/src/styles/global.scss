@@ -22,14 +22,15 @@ body {
 }
 
 ::placeholder {
-	color: #ccc;
-	font-size: 15px;
+	color: #7a6a6e;
+	font-size: 0.4rem;
+	text-align: center;
 }
 
 // 글자 선택시 밑배경
 ::selection {
 	color: #fff;
-	background-color: #7a6a6e;
+	background-color: #654b52;
 }
 
 // 스크롤 설정
