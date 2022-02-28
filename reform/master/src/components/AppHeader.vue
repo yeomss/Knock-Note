@@ -2,7 +2,9 @@
 	<!-- 헤더 -->
 	<div class="header">
 		<img src="../assets/logo.png" />
-		<p class="text-shadow">Knock Note</p>
+		<p class="text-shadow">
+			<a href="javascript:location.reload()">Knock Note</a>
+		</p>
 		<button class="add-btn" @click.prevent="openEditor">
 			<i class="fas fa-plus"></i>
 		</button>
@@ -28,12 +30,18 @@ export default {
 	z-index: 100; // 제일 높게
 	top: 0;
 	background: #f4cccc;
-	color: #fff;
-	& p {
+
+	cursor: default;
+
+	a {
+		color: #fff;
+		text-decoration: none; // 밑줄 없애기
+	}
+	p {
 		font-size: 35px;
 		margin: 15px 20px;
 	}
-	& img {
+	img {
 		margin-left: 20px;
 		height: 50px;
 	}

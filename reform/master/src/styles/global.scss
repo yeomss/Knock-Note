@@ -1,6 +1,7 @@
 html {
 	box-sizing: border-box;
 	height: 100%;
+	cursor: default;
 }
 
 *,
@@ -13,7 +14,6 @@ body {
 	background: rgb(241, 241, 241);
 	font-family: "Jua", "SUIT Variable", "Apple SD Gothic", "Open Sans",
 		sans-serif;
-	font-weight: 400;
 	font-size: 1.1rem;
 	color: #654b52;
 	margin: 0;
@@ -24,6 +24,21 @@ body {
 ::placeholder {
 	color: #ccc;
 	font-size: 15px;
+}
+
+// 글자 선택시 밑배경
+::selection {
+	color: #fff;
+	background-color: #7a6a6e;
+}
+
+// 스크롤 설정
+::-webkit-scrollbar {
+	width: 4px;
+}
+::-webkit-scrollbar-thumb {
+	background-color: #654b52;
+	border-radius: 500px;
 }
 
 .text-shadow {
@@ -51,17 +66,12 @@ body {
 	cursor: pointer;
 }
 
-.note-title {
-	margin-right: 15px;
-	outline: none;
-}
-
 // sub contents
 .subContainer {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
-	margin: 20px;
+	margin: 1rem;
 }
 
 // main contents
