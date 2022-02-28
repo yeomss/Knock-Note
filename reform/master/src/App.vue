@@ -225,25 +225,8 @@ export default {
 
 	// Vue Life cycle
 	async mounted() {
-		// if (localStorage.getItem("notes"))
-		// 	this.notes = JSON.parse(localStorage.getItem("notes"));
-		// 객체 탐지 모델 로드
-		// let img = new Image();
-		// let url = "https://newsimg.sedaily.com/2021/12/09/22V85NTJGY_1.jpg";
-		// img.crossOrigin = "Anonymous";
-		// img.src = "./assets/dog.jpg";
-		// img.width = 100;
-		// img.height = 100;
-
-		this.model = await cocoSSD.load();
-
-		// let img = document.querySelector(".hihi");
-		// img.onload = async () => {
-		// 	console.log(img);
-		// 	this.model = await cocoSSD.load();
-		// 	let tmp = await this.model.detect(img);
-		// 	console.log(tmp);
-		// };
+		// 객체 탐지 모델
+		this.model = await cocoSSD.load(); // Promise 객체를 반환.
 	},
 
 	async created() {
@@ -278,7 +261,7 @@ export default {
 		const auth = getAuth();
 
 		// 익명 로그인
-		signInAnonymously(auth)
+		await signInAnonymously(auth)
 			.then(() => {
 				// 로그인 상태 변화 관찰
 				onAuthStateChanged(auth, (user) => {

@@ -49,20 +49,32 @@
 
 			<!-- 노트 서브 -->
 			<div>{{ note.createDate }} {{ note.category }}</div>
-			<div>not yet 감지 객체 : {{ detected }}</div>
+			<div>감지 객체 : {{ note.detected }}</div>
 
 			<!-- 노트 본문 -->
 			<div class="note-contents">
 				<!-- 노트 이미지 -->
-				<img
-					class="note-img"
-					:class="key"
-					:src="note.img.url"
-					@click="detectImg(key)"
-				/>
+				<img class="note-img" :class="key" :src="note.img.url" />
 
 				<!-- 노트 텍스트 내용-->
-				<p class="note-text">{{ note.text }}</p>
+				<div class="note-text-wrapper">
+					<p
+						class="note-text"
+						v-if="!note.text.isEdit"
+						@click="openEdit(key)"
+					>
+						{{ note.text.text }}
+					</p>
+					<textarea
+						type="text"
+						id="note-text-area"
+						v-model="editText"
+						v-else
+						@change="editNote(key)"
+						@keyup.enter="editNote(key)"
+						@blur="editNote(key)"
+					></textarea>
+				</div>
 
 				<span>{{ note.translated }}</span>
 			</div>
@@ -104,9 +116,9 @@
 				</span>
 
 				<!-- 표정 인식 -->
-				<div @click="detectEmotion(key)">
+				<span @click.prevent="detectEmotion(key)">
 					표정인식<span class="material-icons"> mood </span>
-				</div>
+				</span>
 			</div>
 		</div>
 	</div>
@@ -138,7 +150,9 @@ export default {
 			// 노트 색상 테마들
 			themes: ["#F4CCCC", "#EB9F9F", "#E7D9E7", "#FFF2CC", "#F2F2F2"],
 
-			detected: "", // 객체 탐지
+			// 노트 정보
+			editText: "", // 수정 내용
+			file: null, //test
 		};
 	},
 
@@ -146,6 +160,46 @@ export default {
 		// 노트 삭제
 		deleteNote(key) {
 			this.$emit("deleteNote", key);
+		},
+
+		// 노트 수정
+		editNote(key) {
+			let uid = this.user.uid;
+
+			let editedNote = {
+				isEdit: false,
+				text: this.editText,
+			};
+
+			const updates = {};
+
+			// 해당 데이터의 위치
+			updates["/notes/" + uid + "/" + key + "/text"] = editedNote;
+
+			// 해당 데이터만 업데이트
+			update(ref(this.db), updates);
+		},
+		// 노트 수정 열기
+		openEdit(key) {
+			let uid = this.user.uid;
+
+			let isEdit = !this.notes[key].text.isEdit;
+
+			// textarea 에 수정 전의 텍스트가 뜨도록
+			this.editText = this.notes[key].text.text;
+
+			const updates = {};
+
+			// 해당 데이터의 위치
+			updates["/notes/" + uid + "/" + key + "/text/isEdit"] = isEdit;
+
+			// 해당 데이터만 업데이트
+			update(ref(this.db), updates);
+
+			// textarea 에 포커싱
+			setTimeout(() => {
+				document.getElementById("note-text-area").focus();
+			}, 400);
 		},
 
 		// 노트 이미지 객체 인식
@@ -158,37 +212,79 @@ export default {
 			noteImg.height = 300;
 			const img = noteImg; // 이거 안하면 오류남.. 왜지??
 
+			let uid = this.user.uid; // uid
+
 			// 객체 탐지
 			let detected = await this.model.detect(img);
 
 			// 만약 객체가 탐지가 되면
 			if (detected.length != 0) {
-				this.detected = detected[0].class;
-			} else {
-				this.detected = "감지 실패";
-			}
-		},
-
-		// 노트 사진 감정 인식
-		async detectEmotion(key) {
-			console.log("emition", key);
-
-			let url = "http://127.0.0.1:3000/face";
-			let data = { fileUrl: this.notes[key].img.url };
-
-			await axios.post(url, data).then((res) => {
-				console.log("emotion:", res.data["faces"][0]);
-
-				let emotion = res.data["faces"][0]; // 감정 인식
-				let uid = this.user.uid; // uid
+				detected = detected[0].class; // 탐지 내용
 
 				const updates = {};
 
 				// 해당 데이터의 위치
-				updates["/notes/" + uid + "/" + key + "/emotion"] = emotion;
+				updates["/notes/" + uid + "/" + key + "/detected"] = detected;
 
 				// 해당 데이터만 업데이트
 				update(ref(this.db), updates);
+			} else {
+				detected = "감지❌"; // 탐지 내용
+
+				const updates = {};
+
+				// 해당 데이터의 위치
+				updates["/notes/" + uid + "/" + key + "/detected"] = detected;
+
+				// 해당 데이터만 업데이트
+				update(ref(this.db), updates);
+			}
+		},
+
+		// 노트 사진 감정 인식
+		detectEmotion(key) {
+			console.log("emition", key);
+
+			let url = "http://127.0.0.1:3000/face";
+			// let img_ =
+			// "/Users/yeomss/Repository/Github/Toy-Project/Open-Source-Note-App/reform/master/src/assets/smile2.jpeg";
+			let data = { fileUrl: this.notes[key].img.url };
+			// let img_ =
+			// "gs://osp20-25073.appspot.com/images/f3teg5RS6fdxeAI43bycELJ99nR2/-MwwVafyiJp-7Pg6O2La/noteImage.jpeg";
+			// let data = { fileUrl: img_ };
+
+			// let formData = new FormData();
+
+			// if (this.file) {
+			// 	console.log(this.file.length);
+			// 	for (let i = 0; i < this.file.length; i++) {
+			// 		formData.append("image", this.file[i]);
+			// 	}
+			// }
+			// formData.append("hihi", 123);
+			// console.log("hehe:", formData.get("image"));
+
+			// console.log("formData:", formData);
+			// console.log(typeof formData);
+
+			// let data = { ho: "hi" };
+			// let data = JSON.parse(JSON.stringify(formData));
+			// let data = formData;
+			// let data = localStorage.getItem(key);
+			axios.post(url, data).then((res) => {
+				console.log(res.data);
+				// console.log("emotion:", res.data["faces"][0]);
+
+				// let emotion = res.data["faces"][0]; // 감정 인식
+				// let uid = this.user.uid; // uid
+
+				// const updates = {};
+
+				// // 해당 데이터의 위치
+				// updates["/notes/" + uid + "/" + key + "/emotion"] = emotion;
+
+				// // 해당 데이터만 업데이트
+				// update(ref(this.db), updates);
 			});
 		},
 
@@ -242,16 +338,14 @@ export default {
 
 		// 노트 이미지 파일 탐색기 열기
 		setImgExploer(key) {
-			console.log(key);
 			document.querySelector(`.imgInput.${key}`).click();
-			console.log(document.querySelector(`.imgInput.${key}`));
 		},
 		// 노트 이미지 설정
 		setImg(e, key) {
-			console.log(e, key);
 			// 이미지 다시 저장
 			const uid = this.user.uid;
 			let imgFile = e.target.files[0]; // 이미지 파일 객체
+			this.file = e.target.files;
 
 			// 파일 객체 로컬 스토리지에 저장
 			// 이거는 나중에 객체 탐지할 때 사용
@@ -395,27 +489,6 @@ export default {
 				);
 			});
 		},
-
-		// 노트 이미지 가져오기
-		// getImg(note) {
-		// firestore 사용하는 방법
-		// const imgRef = doc(this.store, "images", "8eGMuxesOGAgg7FsFAO8");
-		// const imgSnap = await getDoc(imgRef);
-		// if (imgSnap.exists()) {
-		// 	console.log("Document data:", imgSnap.data());
-		// } else {
-		// 	console.log("No such document!");
-		// }
-		// let uid = this.user.uid;
-		// const imgRef = ref(this.storage, `images/${uid}/${note.img}`);
-		// getDownloadURL(imgRef)
-		// 	.then((url) => {
-		// 		return url;
-		// 	})
-		// 	.catch((error) => {
-		// 		console.log(error);
-		// 	});
-		// },
 	},
 
 	watch: {
@@ -461,6 +534,9 @@ export default {
 	img {
 		width: 200px;
 	}
+}
+.note-text {
+	margin: 0;
 }
 
 .note-img-wrapper {

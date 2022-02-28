@@ -20,13 +20,23 @@ app.post("/face", function (req, res) {
 	var api_url = "https://openapi.naver.com/v1/vision/face"; // 얼굴 감지
 
 	// res 데이터
-	var obj = JSON.parse(JSON.stringify(req.body));
+	// req.body 로 데이터가 들어온다.
+	// 들어온 데이터를 본 폴더에 파일로 저장하기 위해서 writeStream 을 사용한다.
+	// 이렇게 하면 본 폴더에 noteImg.jpg 파일이 만들어진다.
+	var stream = request(req.body.fileUrl);
+	var writeStream = fs.createWriteStream("test.jpg");
+
+	stream.on("data", function (data) {
+		writeStream.write(data);
+	});
+
+	stream.on("end", function () {
+		writeStream.end();
+	});
 
 	var _formData = {
-		// image: "image",
-		image: fs.createReadStream(obj.fileUrl),
-		// image: fs.createReadStream(__dirname + "/images/iu.jpg"), // FILE 이름
-		// image: obj.fileUrl,
+		image: "image",
+		image: fs.createReadStream(__dirname + "/test.jpg"),
 	};
 
 	var data = {
@@ -40,7 +50,7 @@ app.post("/face", function (req, res) {
 
 	var _req = request.post(data, (err, response, body) => {
 		console.log(body);
-		res.send(body);
+		// res.send(body);
 		// console.log(_req.body);
 		// res.send(_req.body);
 		// res.send(body);

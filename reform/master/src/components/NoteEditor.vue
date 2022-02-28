@@ -59,7 +59,7 @@
 					<!-- 노트 본문 입력 창 -->
 					<textarea
 						rows="10"
-						v-model="text"
+						v-model="text.text"
 						placeholder="똑똑 노트 두드립시다 📝"
 					></textarea>
 
@@ -99,10 +99,11 @@ export default {
 		return {
 			title: "", // 노트 제목
 			theme: { isOpen: false, theme: "#f4cccc" }, // 노트 테마
-			text: "", // 노트 본문
+			text: { isEdit: false, text: "" }, // 노트 본문
 			category: "", // 카테고리
-			createDate: moment().format("YYYY-MM-DD ddd"), // 생성일자
+			createDate: "", // 생성일자
 			img: { isUpload: false, type: "", url: "" }, // 노트 이미지
+			detected: "감지❌", // 노트 이미지 객체 탐지
 			translated: "", // 노트 번역
 			emotion: "", // 노트 이미지 감정 인식
 
@@ -116,6 +117,7 @@ export default {
 		async createNew() {
 			// 데이터 저장
 			let uid = this.user.uid;
+			this.createDate = moment().format("YYYY-MM-DD ddd");
 
 			// 새 노트
 			let newNote = {
@@ -125,8 +127,9 @@ export default {
 				category: this.category,
 				createDate: this.createDate,
 				img: this.img,
-				translated: "",
-				emotion: "",
+				detected: this.detected,
+				translated: this.translated,
+				emotion: this.emotion,
 			};
 
 			push(dbRef(this.db, "notes/" + uid), newNote); // db에 노트 정보 저장
@@ -164,11 +167,12 @@ export default {
 		// 노트 에디터 내용 초기화
 		initEditor() {
 			this.title = "";
-			this.text = "";
+			this.text = { isEdit: false, text: "" };
 			this.theme = { isOpen: false, theme: "#f4cccc" };
 			this.category = "";
 			this.createDate = "";
 			this.img = { isUpload: false, type: "", url: "" };
+			this.detected = "감지❌";
 			this.translated = "";
 			this.emotion = "";
 		},
