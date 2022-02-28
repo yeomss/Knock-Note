@@ -21,6 +21,30 @@ body {
 	height: 100%;
 }
 
+select {
+	font-family: "SUIT Variable", "Apple SD Gothic", "Open Sans", sans-serif;
+	font-weight: bold;
+	// width: 100%;
+	background-color: rgba(235, 235, 235, 0.4);
+	color: #654b52;
+	outline: none;
+	border-radius: 3px;
+	transition: all 0.5s ease;
+	outline-color: #eb9f9f;
+	// border-color: #654b52;
+	border: none;
+	border-bottom: 1px solid #654b527e;
+	// box-shadow: 2px 0 4px rgba(126, 83, 83, 0.05),
+	// 	0 2px 4px rgba(126, 83, 83, 0.05), 0 2px 8px rgba(126, 83, 83, 0.05),
+	// 	0 5px 16px rgba(126, 83, 83, 0.05);
+}
+
+hr {
+	border: 0px;
+	height: 0.2px;
+	background-color: #654b5252;
+}
+
 ::placeholder {
 	color: #7a6a6e;
 	font-size: 0.4rem;
@@ -72,7 +96,8 @@ body {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
-	margin: 1rem;
+	align-items: center;
+	margin: 0.6rem;
 }
 
 // main contents

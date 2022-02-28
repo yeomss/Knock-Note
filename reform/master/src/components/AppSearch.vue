@@ -6,7 +6,9 @@
 			v-model="searchTxt"
 			@keyup.enter="searchNote"
 		/>
-		<span @click.prevent="searchNote">검색 버튼</span>
+		<span @click="searchNote">
+			<span class="material-icons searchBtn"> search </span>
+		</span>
 	</div>
 </template>
 
@@ -21,7 +23,6 @@ export default {
 	methods: {
 		searchNote() {
 			this.$emit("searchNote", this.searchTxt);
-			this.searchTxt = "";
 		},
 	},
 };
@@ -29,7 +30,29 @@ export default {
 
 <style lang="scss" scoped>
 .searchContainer {
-	// width: 50%;
-	background-color: tomato;
+	width: 12rem;
+	display: flex;
+	justify-content: space-evenly;
+	align-items: center;
+
+	input {
+		color: #654b52;
+		border: none;
+		opacity: 0.5;
+		border-bottom: #654b52 1px solid;
+		transition: all 0.3s ease;
+		&:focus {
+			outline: none;
+			opacity: 1;
+		}
+	}
+}
+
+.searchBtn {
+	color: #654b52;
+	font-size: 1.2rem;
+	text-align: center;
+	padding-top: 5px;
+	cursor: pointer;
 }
 </style>

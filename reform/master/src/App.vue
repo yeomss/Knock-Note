@@ -27,6 +27,7 @@
 			/>
 			<AppSearch @searchNote="searchNote" />
 		</div>
+		<!-- <hr /> -->
 
 		<div class="contentsContainer" v-if="notes">
 			<!-- 노트 todoList -->
@@ -97,7 +98,7 @@ export default {
 
 			// 데이터
 			editorOpen: false, // note editor toggle
-			category: null, // 설정한 카테고리
+			category: "", // 설정한 카테고리
 			searchTxt: "", // 검색하려는 키워드
 
 			// 객체 탐지

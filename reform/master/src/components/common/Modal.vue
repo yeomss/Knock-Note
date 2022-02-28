@@ -3,6 +3,10 @@
 		<div class="modal-mask" v-if="showModal">
 			<div class="modal-wrapper">
 				<div class="modal-container">
+					<span @click="closeModal">
+						<i class="fas fa-times closeBtn"></i>
+					</span>
+
 					<!-- modal header -->
 					<div class="modal-header">
 						<slot name="header"> default header </slot>
@@ -21,13 +25,19 @@
 <script>
 export default {
 	props: ["showModal"],
+
+	methods: {
+		closeModal() {
+			this.$emit("closeModal");
+		},
+	},
 };
 </script>
 
-<style>
+<style lang="scss">
 .modal-mask {
 	position: fixed;
-	z-index: 9998;
+	z-index: 100;
 	top: 0;
 	left: 0;
 	width: 100%;
@@ -35,6 +45,7 @@ export default {
 	background-color: rgba(0, 0, 0, 0.5);
 	display: table;
 	transition: opacity 0.3s ease;
+	color: #fff;
 }
 
 .modal-wrapper {
@@ -46,20 +57,45 @@ export default {
 	width: 300px;
 	margin: 0px auto;
 	padding: 20px 30px;
-	background-color: #fff;
+	background-color: #654b52;
 	border-radius: 2px;
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
 	transition: all 0.3s ease;
-	font-family: Helvetica, Arial, sans-serif;
+	font-family: "Jua", "SUIT Variable", "Apple SD Gothic", "Open Sans",
+		sans-serif;
 }
 
 .modal-header h3 {
 	margin-top: 0;
-	color: #42b983;
+	color: #fff;
+	text-align: center;
 }
 
 .modal-body {
 	margin: 20px 0;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+
+	ul {
+		list-style-type: none;
+		padding-left: 0px;
+		margin: 0.3rem;
+		// margin-top: 0.5rem;
+
+		li {
+			width: 5rem;
+			// margin-left: 0.5rem;
+			display: flex;
+			align-items: center;
+		}
+	}
+}
+.closeBtn {
+	z-index: 101;
+	margin-left: 15rem;
+	color: #eb9f9f;
+	cursor: pointer;
 }
 
 .modal-default-button {

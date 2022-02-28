@@ -2,7 +2,7 @@
 	<div class="noteContainer">
 		<!-- <div @click="temp">하이루</div> -->
 		<div
-			v-for="(note, key) in notes"
+			v-for="(note, key) in notesFilter(selectedCategory, searchTxt)"
 			:key="`note-${key}`"
 			class="note shadow"
 			:style="{ 'background-color': note.theme.theme }"
@@ -23,7 +23,6 @@
 						placeholder="Knock Note 👋"
 					></textarea>
 				</div>
-
 				<textarea
 					id="note-title-area"
 					v-model="editTitle"
@@ -41,12 +40,19 @@
 
 			<!-- 노트 서브 -->
 			<div class="note-meta-wrapper">
+				<!-- 노트 날짜-->
 				<div class="note-date">
 					{{ note.createDate }}
 				</div>
 
+				<!-- 노트 카테고리 -->
 				<div class="note-category">
-					<select v-model="note.category">
+					<!-- 노트 카테고리 설정 -->
+					<select
+						v-model="notesCategory[key]"
+						@change="setNoteCategory(key)"
+						@blur="setNoteCategory(key)"
+					>
 						<option v-for="category in categorys" :key="category">
 							{{ category }}
 						</option>
@@ -156,6 +162,7 @@
 							<span class="material-icons"> image </span>
 						</span>
 					</div>
+
 					<div>
 						<!-- 음성 인식 -->
 						<span @click="voiceNote(key)">
@@ -227,6 +234,7 @@ export default {
 			// 노트 정보
 			editTitle: "", // 수정 제목
 			editText: "", // 수정 내용
+			notesCategory: {},
 			file: null, //test
 		};
 	},
@@ -235,6 +243,19 @@ export default {
 		// 노트 삭제
 		deleteNote(key) {
 			this.$emit("deleteNote", key);
+		},
+
+		// 노트 카테고리 설정
+		setNoteCategory(key) {
+			let uid = this.user.uid;
+			const updates = {};
+
+			// 해당 데이터의 위치
+			updates["/notes/" + uid + "/" + key + "/category"] =
+				this.notesCategory[key];
+
+			// 해당 데이터만 업데이트
+			update(ref(this.db), updates);
 		},
 
 		// 노트 타이틀 수정
@@ -621,25 +642,21 @@ export default {
 			return Object.filter(note_, (note) => {
 				return (
 					(note.category == selectedCategory ||
-						selectedCategory == "") &&
-					(note.text.includes(searchTxt) ||
-						note.title.includes(searchTxt) ||
-						searchTxt == "")
+						this.selectedCategory == "") &&
+					(note.text.text.includes(searchTxt) ||
+						note.title.text.includes(searchTxt) ||
+						this.searchTxt == "")
 				);
 			});
 		},
 	},
 
-	watch: {
-		// 카테고리
-		selectedCategory() {
-			console.log("category:", this.selectedCategory);
-		},
-
-		// 검색 키워드
-		searchTxt() {
-			console.log("search:", this.searchTxt);
-		},
+	created() {
+		// 카테고리만 가져와서 배열 만듦
+		// 노트 select 에서 사용
+		for (let i in this.notes) {
+			this.notesCategory[i] = this.notes[i].category;
+		}
 	},
 };
 </script>
@@ -702,15 +719,17 @@ export default {
 	}
 
 	.note-date {
-		font-size: 0.2rem;
+		font-size: 0.3rem;
 	}
 
 	.note-line {
 		width: 100%;
-		border: 0px;
-		height: 0.2px;
-		// background-color: #7a6a6e;
-		background-color: #654b5252;
+	}
+
+	.note-category {
+		select {
+			width: 100%;
+		}
 	}
 }
 .note-title-wrapper {
@@ -723,7 +742,6 @@ export default {
 	}
 }
 .note-meta-wrapper {
-	background-color: tan;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
