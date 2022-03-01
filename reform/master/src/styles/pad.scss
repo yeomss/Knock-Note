@@ -1,7 +1,35 @@
-@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+// @media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+@media only screen and (min-device-width: 768px) and (max-width: 1224px) {
 	.contentsContainer .noteContainer {
 		display: grid;
 		grid-template-columns: repeat(2, 1fr);
-		background-color: aqua;
+	}
+}
+
+@media only screen and (min-width: 1224px) {
+	.contentsContainer .noteContainer {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+	}
+}
+
+@media only screen and (min-width: 1500px) {
+	.contentsContainer .noteContainer {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+	}
+}
+
+@media only screen and (min-width: 2200px) {
+	.contentsContainer .noteContainer {
+		display: grid;
+		grid-template-columns: repeat(5, 1fr);
+	}
+}
+
+@media only screen and (min-width: 2500px) {
+	.contentsContainer .noteContainer {
+		display: grid;
+		grid-template-columns: repeat(6, 1fr);
 	}
 }

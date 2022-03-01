@@ -1,21 +1,27 @@
-@media only screen and (min-device-width: 320px) and (max-device-width: 480px) {
-	.todoToggle {
-		display: block;
-		background-color: tan;
-	}
-
+@media only screen and (min-device-width: 320px) and (max-device-width: 768px) {
 	.contentsContainer {
-		background-color: aqua;
 		display: flex;
-		flex-direction: column;
-
-		.todoContainer {
-			width: 100%;
-		}
+		flex-wrap: wrap;
 
 		.noteContainer {
-			width: 100%;
-			background-color: teal;
+			display: flex;
+			flex-direction: column;
+		}
+	}
+
+	.note-editor-mask {
+		.note-editor-container {
+			.note-editor {
+				width: 50%;
+
+				.note-theme {
+					ul {
+						li {
+							padding: 1rem;
+						}
+					}
+				}
+			}
 		}
 	}
 }

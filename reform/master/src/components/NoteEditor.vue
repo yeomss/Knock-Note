@@ -232,8 +232,8 @@ export default {
 }
 
 .note-editor {
-	min-width: 500px;
-	min-height: 500px;
+	min-width: 20rem;
+	min-height: 20rem;
 	margin: 30px auto;
 	display: flex;
 	flex-direction: column;
@@ -315,7 +315,7 @@ export default {
 
 	li {
 		list-style: none;
-		padding: 25px;
+		padding: 2rem;
 		background-color: #ffffff;
 		border: 1px solid #654b52;
 		margin: 2px;
