@@ -3,7 +3,7 @@
 ![](./images/메인화면.png)
 
 <div align='center'>
-<h2><b>2020 오픈소스프로젝트 - Knock Note</b></h2>
+<h1><b>2020 오픈소스프로젝트 - Knock Note</b></h1>
 <p>https://osp20-25073.web.app</p>
 
 <img src="https://img.shields.io/badge/Vue.js-4FC08D?style=flat-square&logo=Vue.js&logoColor=white"/></a>
@@ -39,9 +39,13 @@
 <br/>
 <hr/>
 
+<div align="center">
+<h2>기능 소개</h2>
+<div>
+
 ### 메모 생성/수정/삭제
 
 | 생성                       | 수정 | 삭제 |
 | -------------------------- | ---- | ---- |
-| ![](./images/메모생성.gif) | 수정 | 삭제 |
+| ![](./images/메모생성.gif) | ![](./images/메모수정.gif)  | ![](./images/메모삭제.gif)  |
 | 생성                       | 수정 | 삭제 |
