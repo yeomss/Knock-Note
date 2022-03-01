@@ -1,14 +1,11 @@
 # 🐥 Opensource-Project-Note-App
-![](https://github.com/dua9920/Open-Source-Note-App/blob/main/%EC%BB%B4%ED%8F%AC%EB%84%8C%ED%8A%B8%ED%99%94%EC%A4%91/src/assets/noteKnock.png)
+
+![](./images/메인화면.png)
 
 <div align='center'>
-<h3><b>2020 오픈소스프로젝트 - Note Knock</b></h3>
-<p>🚩 https://osp20-25073.web.app</p>
-<h6>노트 웹 애플리케이션</h6>
-<p>👉 팀 안녕하세염</p>
-   
-   모바일 ❌ 웹 ⭕ 
- 
+<h2><b>2020 오픈소스프로젝트 - Knock Note</b></h2>
+<p>https://osp20-25073.web.app</p>
+
 <img src="https://img.shields.io/badge/Vue.js-4FC08D?style=flat-square&logo=Vue.js&logoColor=white"/></a>
 <img src="https://img.shields.io/badge/HTML-E34F26?style=flat-square&logo=HTML5&logoColor=white"/></a>
 <img src="https://img.shields.io/badge/SCSS-CC6699?style=flat-square&logo=SASS&logoColor=white"/></a>
@@ -16,14 +13,35 @@
 
 </div>
 
-- 기간 : 2020년 10월 ~ 2020년 12월
-```
-Vue.js를 기반으로 한 노트 웹 애플리케이션 만들기
-(CRUD) 노트 내용 및 색상 수정이 가능하며 이미지 업로드 가능
-텐서플로우.js를 활용하여 이미지 객체 인식
-네이버 API 사용 노트 내용 번역 및 이미지 감정 인식
-firebase를 통한 간단한 배포
-```
+<br/>
 
-### 마크다운
-- 안녕하세요
+-   기간
+    -   (ver.1) 2020년 10월 ~ 2020년 12월
+    -   (ver.2) 2022년 2월 말 ~ 3월 초
+-   개요
+    -   주어진 Vue.js 코드를 기반으로 각자의 기능과 디자인을 창조하여 메모 앱 제작
+    -   메모 CRUD가 가능해야하며, Tensorflow.js 기능을 접목시켜야함.
+-   기능
+    -   메모 생성/수정/삭제
+    -   메모 카테고리 필터링, 카테고리 추가/삭제
+    -   메모 테마 변경
+    -   메모 이미지 업로드
+    -   메모 검색 필터링
+    -   음성인식을 이용한 메모 작성
+    -   음성으로 메모 내용 읽기
+    -   Tensorflow.js 를 이용한 이미지 객체 탐지
+    -   Naver CFR API 를 이용한 이미지 휴먼 객체 감정 인식
+    -   Naver Papago APi 를 이용한 메모 내용 번역
+    -   To Do List 생성/완료/삭제
+    -   상단으로 이동하기
+    -   반응형 웹 페이지
+
+<br/>
+<hr/>
+
+### 메모 생성/수정/삭제
+
+| 생성                       | 수정 | 삭제 |
+| -------------------------- | ---- | ---- |
+| ![](./images/메모생성.gif) | 수정 | 삭제 |
+| 생성                       | 수정 | 삭제 |
