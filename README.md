@@ -10,6 +10,8 @@
 <img src="https://img.shields.io/badge/HTML-E34F26?style=flat-square&logo=HTML5&logoColor=white"/></a>
 <img src="https://img.shields.io/badge/SCSS-CC6699?style=flat-square&logo=SASS&logoColor=white"/></a>
 <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=Node.js&logoColor=white"/></a>
+<img src="https://img.shields.io/badge/Firebase-FFCA28?style=flat-square&logo=Firebase&logoColor=white"/></a>
+
 
 </div>
 
@@ -33,6 +35,7 @@
     -   To Do List 생성/완료/삭제
     -   상단으로 이동하기
     -   반응형 웹 페이지
+    -   Firebase 인증/데이터베이스/스토리지 사용
 <hr/>
 <br/>
 <br/>
@@ -155,3 +158,11 @@
 ### [To Do List]
 - 화면 좌측에 존재하는 ToDoList 기능으로 할 일을 작성할 수 있습니다.
 - 할 일을 체크하고, 삭제도 가능합니다.
+
+
+<br/>
+<br/>
+
+![](./images/반응형웹.gif)
+### [반응형 웹]
+- 반응형 웹 사이트입니다.
