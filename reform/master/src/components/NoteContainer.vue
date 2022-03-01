@@ -7,6 +7,14 @@
 			class="note shadow"
 			:style="{ 'background-color': note.theme.theme }"
 		>
+			<!-- 노트 서브 -->
+			<div class="note-meta-wrapper">
+				<!-- 노트 날짜-->
+				<div class="note-date">
+					{{ note.createDate }}
+				</div>
+			</div>
+
 			<!-- 노트 제목 -->
 			<div class="note-title-wrapper">
 				<div v-if="!note.title.isEdit">
@@ -37,14 +45,6 @@
 			<span class="delete" @click.prevent="deleteNote(key)">
 				<i class="fas fa-times"></i>
 			</span>
-
-			<!-- 노트 서브 -->
-			<div class="note-meta-wrapper">
-				<!-- 노트 날짜-->
-				<div class="note-date">
-					{{ note.createDate }}
-				</div>
-			</div>
 
 			<!-- 노트 모달 -->
 			<NoteModal
@@ -94,14 +94,21 @@
 			</div>
 
 			<hr class="note-line" />
+
 			<!-- 노트 버튼 기능 -->
 			<div class="note-btns">
 				<div class="note-btns-wrapper-1">
 					<div>
 						<!-- 노트 테마 -->
+						<HelpModal
+							v-if="note.helps.theme"
+							:message="'테마 설정'"
+						/>
 						<span
 							class="material-icons note-btn"
 							@click="noteThemeOpen(key, note.theme)"
+							@mouseover="openHelpTheme(key)"
+							@mouseout="closeHelpTheme(key)"
 						>
 							palette
 						</span>
@@ -137,7 +144,13 @@
 						<span
 							class="note-img-wrapper"
 							@click="setImgExploer(key)"
+							@mouseover="openHelpImg(key)"
+							@mouseout="closeHelpImg(key)"
 						>
+							<HelpModal
+								v-if="note.helps.img"
+								:message="'이미지 업로드'"
+							/>
 							<input
 								class="imgInput"
 								:class="key"
@@ -149,12 +162,28 @@
 						</span>
 
 						<!-- 음성 인식 -->
-						<span @click="voiceNote(key)">
+						<span
+							@click="voiceNote(key)"
+							@mouseover="openHelpVoice(key)"
+							@mouseout="closeHelpVoice(key)"
+						>
+							<HelpModal
+								v-if="note.helps.voice"
+								:message="'음성인식'"
+							/>
 							<span class="material-icons note-btn"> mic </span>
 						</span>
 
 						<!-- 노트 읽기 -->
-						<span @click="speakNote(note.text.text)">
+						<span
+							@click="speakNote(note.text.text)"
+							@mouseover="openHelpSpeak(key)"
+							@mouseout="closeHelpSpeak(key)"
+						>
+							<HelpModal
+								v-if="note.helps.speak"
+								:message="'노트 읽기'"
+							/>
 							<span class="material-icons note-btn">
 								volume_up
 							</span>
@@ -165,22 +194,44 @@
 							class="note-detect"
 							:class="key"
 							@click="detectImg(key)"
+							@mouseover="openHelpDetect(key)"
+							@mouseout="closeHelpDetect(key)"
 						>
+							<HelpModal
+								v-if="note.helps.detect"
+								:message="'이미지 객체 탐지'"
+							/>
 							<span class="material-icons note-btn">
 								auto_fix_high
 							</span>
 						</span>
 
+						<!-- 표정 인식 -->
+						<span
+							@click.prevent="detectMood(key)"
+							@mouseover="openHelpMood(key)"
+							@mouseout="closeHelpMood(key)"
+						>
+							<HelpModal
+								v-if="note.helps.mood"
+								:message="'이미지 감정 탐지'"
+							/>
+							<span class="material-icons note-btn"> mood </span>
+						</span>
+
 						<!-- 번역 -->
-						<span @click="translateNote(key)">
+						<span
+							@click="translateNote(key)"
+							@mouseover="openHelpTranslate(key)"
+							@mouseout="closeHelpTranslate(key)"
+						>
+							<HelpModal
+								v-if="note.helps.translate"
+								:message="'번역'"
+							/>
 							<span class="material-icons note-btn">
 								g_translate
 							</span>
-						</span>
-
-						<!-- 표정 인식 -->
-						<span @click.prevent="detectEmotion(key)">
-							<span class="material-icons note-btn"> mood </span>
 						</span>
 					</div>
 				</div>
@@ -213,6 +264,7 @@ import { update, ref } from "firebase/database";
 import axios from "axios";
 
 import NoteModal from "./common/NoteModal.vue";
+import HelpModal from "./common/HelpModal.vue";
 
 export default {
 	props: [
@@ -226,7 +278,7 @@ export default {
 		"model",
 	],
 
-	components: { NoteModal },
+	components: { NoteModal, HelpModal },
 
 	data() {
 		return {
@@ -255,6 +307,148 @@ export default {
 			// 해당 데이터의 위치
 			updates["/notes/" + uid + "/" + key + "/category"] =
 				this.notesCategory[key];
+
+			// 해당 데이터만 업데이트
+			update(ref(this.db), updates);
+		},
+
+		// 노트 헬프 버튼
+		openHelpTheme(key) {
+			let uid = this.user.uid;
+			const updates = {};
+
+			// 해당 데이터의 위치
+			updates["/notes/" + uid + "/" + key + "/helps/theme"] = true;
+
+			// 해당 데이터만 업데이트
+			update(ref(this.db), updates);
+		},
+		closeHelpTheme(key) {
+			let uid = this.user.uid;
+			const updates = {};
+
+			// 해당 데이터의 위치
+			updates["/notes/" + uid + "/" + key + "/helps/theme"] = false;
+
+			// 해당 데이터만 업데이트
+			update(ref(this.db), updates);
+		},
+		openHelpImg(key) {
+			let uid = this.user.uid;
+			const updates = {};
+
+			// 해당 데이터의 위치
+			updates["/notes/" + uid + "/" + key + "/helps/img"] = true;
+
+			// 해당 데이터만 업데이트
+			update(ref(this.db), updates);
+		},
+		closeHelpImg(key) {
+			let uid = this.user.uid;
+			const updates = {};
+
+			// 해당 데이터의 위치
+			updates["/notes/" + uid + "/" + key + "/helps/img"] = false;
+
+			// 해당 데이터만 업데이트
+			update(ref(this.db), updates);
+		},
+		openHelpVoice(key) {
+			let uid = this.user.uid;
+			const updates = {};
+
+			// 해당 데이터의 위치
+			updates["/notes/" + uid + "/" + key + "/helps/voice"] = true;
+
+			// 해당 데이터만 업데이트
+			update(ref(this.db), updates);
+		},
+		closeHelpVoice(key) {
+			let uid = this.user.uid;
+			const updates = {};
+
+			// 해당 데이터의 위치
+			updates["/notes/" + uid + "/" + key + "/helps/voice"] = false;
+
+			// 해당 데이터만 업데이트
+			update(ref(this.db), updates);
+		},
+		openHelpSpeak(key) {
+			let uid = this.user.uid;
+			const updates = {};
+
+			// 해당 데이터의 위치
+			updates["/notes/" + uid + "/" + key + "/helps/speak"] = true;
+
+			// 해당 데이터만 업데이트
+			update(ref(this.db), updates);
+		},
+		closeHelpSpeak(key) {
+			let uid = this.user.uid;
+			const updates = {};
+
+			// 해당 데이터의 위치
+			updates["/notes/" + uid + "/" + key + "/helps/speak"] = false;
+
+			// 해당 데이터만 업데이트
+			update(ref(this.db), updates);
+		},
+		openHelpDetect(key) {
+			let uid = this.user.uid;
+			const updates = {};
+
+			// 해당 데이터의 위치
+			updates["/notes/" + uid + "/" + key + "/helps/detect"] = true;
+
+			// 해당 데이터만 업데이트
+			update(ref(this.db), updates);
+		},
+		closeHelpDetect(key) {
+			let uid = this.user.uid;
+			const updates = {};
+
+			// 해당 데이터의 위치
+			updates["/notes/" + uid + "/" + key + "/helps/detect"] = false;
+
+			// 해당 데이터만 업데이트
+			update(ref(this.db), updates);
+		},
+		openHelpTranslate(key) {
+			let uid = this.user.uid;
+			const updates = {};
+
+			// 해당 데이터의 위치
+			updates["/notes/" + uid + "/" + key + "/helps/translate"] = true;
+
+			// 해당 데이터만 업데이트
+			update(ref(this.db), updates);
+		},
+		closeHelpTranslate(key) {
+			let uid = this.user.uid;
+			const updates = {};
+
+			// 해당 데이터의 위치
+			updates["/notes/" + uid + "/" + key + "/helps/translate"] = false;
+
+			// 해당 데이터만 업데이트
+			update(ref(this.db), updates);
+		},
+		openHelpMood(key) {
+			let uid = this.user.uid;
+			const updates = {};
+
+			// 해당 데이터의 위치
+			updates["/notes/" + uid + "/" + key + "/helps/mood"] = true;
+
+			// 해당 데이터만 업데이트
+			update(ref(this.db), updates);
+		},
+		closeHelpMood(key) {
+			let uid = this.user.uid;
+			const updates = {};
+
+			// 해당 데이터의 위치
+			updates["/notes/" + uid + "/" + key + "/helps/mood"] = false;
 
 			// 해당 데이터만 업데이트
 			update(ref(this.db), updates);
@@ -400,7 +594,7 @@ export default {
 		},
 
 		// 노트 사진 감정 인식
-		detectEmotion(key) {
+		detectMood(key) {
 			console.log("emition", key);
 
 			let url = "http://127.0.0.1:3000/face";
@@ -410,15 +604,14 @@ export default {
 				.post(url, data)
 				.then((res) => {
 					console.log(res.data);
-					// console.log("emotion:", res.data["faces"][0]);
 
-					let emotion = res.data["faces"][0]; // 감정 인식
+					let mood = res.data["faces"][0]; // 감정 인식
 					let uid = this.user.uid; // uid
 
 					const updates = {};
 
 					// 해당 데이터의 위치
-					updates["/notes/" + uid + "/" + key + "/emotion"] = emotion;
+					updates["/notes/" + uid + "/" + key + "/mood"] = mood;
 
 					// 해당 데이터만 업데이트
 					update(ref(this.db), updates);
@@ -648,6 +841,14 @@ export default {
 			this.notesCategory[i] = this.notes[i].category;
 		}
 	},
+
+	watch: {
+		notes() {
+			for (let i in this.notes) {
+				this.notesCategory[i] = this.notes[i].category;
+			}
+		},
+	},
 };
 </script>
 
@@ -697,7 +898,7 @@ export default {
 		background-color: transparent;
 		font-family: "Jua", "SUIT Variable", "Apple SD Gothic", "Open Sans",
 			sans-serif;
-		font-size: 1.1rem;
+		font-size: 1rem;
 		color: #654b52;
 
 		&:hover {
@@ -709,7 +910,11 @@ export default {
 	}
 
 	.note-date {
+		font-family: "Jua", "SUIT Variable", "Apple SD Gothic", "Open Sans",
+			sans-serif;
 		font-size: 0.3rem;
+		color: #654b5252;
+		font-weight: bold;
 	}
 
 	.note-line {
@@ -724,11 +929,11 @@ export default {
 	}
 }
 .note-title-wrapper {
-	font-size: 1.2rem;
+	font-size: 1.15rem;
 	cursor: pointer;
 
 	textarea {
-		font-size: 1.2rem;
+		font-size: 1.15rem;
 		border: none;
 	}
 }
@@ -839,8 +1044,8 @@ export default {
 
 .note-contents {
 	overflow-y: scroll;
-	margin-top: 1rem;
-	margin-bottom: 1.3rem;
+	margin-top: 0.5rem;
+	margin-bottom: 0;
 	height: 100%;
 
 	img {

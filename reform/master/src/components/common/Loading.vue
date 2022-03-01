@@ -20,7 +20,7 @@ export default {};
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	background-color: #f4cccc3f;
+	// background-color: #f4cccc3f;
 	// padding-top: 100px;
 	// height: 600px;
 }

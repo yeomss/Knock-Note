@@ -11,7 +11,6 @@
 			:db="db"
 			:storage="storage"
 			:categorys="categorys"
-			@noteAdded="newNote"
 			@noteDeleted="deleteNote"
 			@editorClose="editorClose"
 		></NoteEditor>
@@ -114,18 +113,22 @@ export default {
 				img: { isUpload: false, type: "", url: "" }, // 노트 이미지
 				detected: { isOpen: false, text: "none" }, // 노트 이미지 객체 탐지
 				translated: "", // 노트 번역
-				emotion: "", // 노트 이미지 감정 인식
+				mood: "", // 노트 이미지 감정 인식
+				helps: {
+					theme: false,
+					img: false,
+					voice: false,
+					speak: false,
+					detect: false,
+					translate: false,
+					mood: false,
+				},
 			},
 		};
 	},
 
 	// 함수
 	methods: {
-		// 새로운 노트 생성
-		newNote(note) {
-			this.notes.push(note);
-		},
-
 		// 노트 삭제
 		deleteNote(key) {
 			// this.notes.splice(index, 1);

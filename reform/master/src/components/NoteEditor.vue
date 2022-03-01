@@ -7,7 +7,9 @@
 					:style="{ 'background-color': theme.theme }"
 				>
 					<!-- <div @click="uploadImg">load</div> -->
-					<div>New Knock 👋</div>
+					<div class="note-editor-main-title text-shadow">
+						New Knock 👋
+					</div>
 
 					<!-- 노트 제목 입력 창 -->
 					<input
@@ -64,10 +66,13 @@
 					<!-- 노트 생성 버튼-->
 					<div class="note-editor-bottom">
 						<span @click="editorClose">
-							<i class="fa-solid fa-circle-xmark"></i>
+							<i class="fa-solid fa-circle-xmark text-shadow"></i>
 						</span>
 						<span @click="createNew">
-							<i class="checkBtn fa-solid fa-circle-check"> </i>
+							<i
+								class="checkBtn fa-solid fa-circle-check text-shadow"
+							>
+							</i>
 						</span>
 					</div>
 				</div>
@@ -98,7 +103,18 @@ export default {
 			img: { isUpload: false, type: "", url: "" }, // 노트 이미지
 			detected: { isOpen: false, text: "none" }, // 노트 이미지 객체 탐지
 			translated: "", // 노트 번역
-			emotion: "", // 노트 이미지 감정 인식
+			mood: "", // 노트 이미지 감정 인식
+
+			// help 모달 창 띄우기
+			helps: {
+				theme: false,
+				img: false,
+				voice: false,
+				speak: false,
+				detect: false,
+				translate: false,
+				mood: false,
+			},
 
 			// 노트 테마 색상
 			themes: ["#F4CCCC", "#EB9F9F", "#E7D9E7", "#FFF2CC", "#F2F2F2"],
@@ -127,7 +143,8 @@ export default {
 				img: this.img,
 				detected: this.detected,
 				translated: this.translated,
-				emotion: this.emotion,
+				mood: this.mood,
+				helps: this.helps,
 			};
 
 			push(dbRef(this.db, "notes/" + uid), newNote); // db에 노트 정보 저장
@@ -172,7 +189,16 @@ export default {
 			this.img = { isUpload: false, type: "", url: "" };
 			this.detected = { isOpen: false, text: "none" };
 			this.translated = "";
-			this.emotion = "";
+			this.mood = "";
+			this.helps = {
+				theme: false,
+				img: false,
+				voice: false,
+				speak: false,
+				detect: false,
+				translate: false,
+				mood: false,
+			};
 		},
 	},
 };
@@ -201,21 +227,22 @@ export default {
 	input {
 		font-family: "Jua", "SUIT Variable", "Apple SD Gothic", "Open Sans",
 			sans-serif;
+		margin-bottom: 1rem;
 	}
 }
 
 .note-editor {
-	min-width: 600px;
-	min-height: 600px;
+	min-width: 500px;
+	min-height: 500px;
 	margin: 30px auto;
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
 	background: #f4cccc;
-	padding: 25px;
+	padding: 2rem;
 	box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
 	border-radius: 3px;
-	transition: all 0.3s;
+	transition: all 0.3s ease;
 
 	textarea {
 		padding: 10px;
@@ -224,6 +251,7 @@ export default {
 		color: #654b52;
 		font-size: 1rem;
 		background-color: rgba(255, 255, 255, 0.3);
+		border-radius: 4px;
 
 		&:hover {
 			outline: 0;
@@ -236,11 +264,17 @@ export default {
 	select {
 		opacity: 1;
 		cursor: pointer;
+		border-radius: 4px;
 	}
 
 	i {
 		font-size: 50px;
 	}
+}
+
+.note-editor-main-title {
+	color: white;
+	margin-bottom: 1rem;
 }
 
 .title-input {
@@ -254,19 +288,28 @@ export default {
 	align-items: center;
 	font-size: 1.2rem;
 
+	select {
+		border: 1px solid #654b52;
+	}
+
 	.add-category {
-		margin-top: 0;
-		margin-left: 1rem;
+		margin-top: 0.2rem;
+		margin-left: 0.5rem;
 	}
 }
 
 .note-theme {
+	padding: 0;
+	margin: 0;
+	width: 100%;
+
 	ul {
 		// background-color: rgba(255, 255, 255, 0.3);
 		display: flex;
+		justify-content: space-between;
 		flex-direction: row;
-		padding: 5px;
-		margin: 0;
+		padding: 0;
+		margin-bottom: 1rem;
 		border-radius: 3px;
 	}
 
@@ -333,14 +376,27 @@ export default {
 	display: flex;
 	align-items: center;
 	justify-content: flex-end;
+
 	// font-size: 1rem;
 
 	span {
 		cursor: pointer;
 		margin-left: 1.1rem;
+		color: white;
+		transition: all 0.3s ease;
+
+		&:nth-child(1) {
+			&:hover {
+				color: #eb9f9f;
+			}
+		}
+		&:nth-child(2) {
+			&:hover {
+				color: #654b52;
+			}
+		}
 
 		i {
-			transition: all 0.3s ease;
 			font-size: 2rem;
 			opacity: 0.7;
 
@@ -349,5 +405,17 @@ export default {
 			}
 		}
 	}
+}
+
+.editor-enter {
+	opacity: 0;
+}
+.editor-leave-active {
+	opacity: 0;
+}
+.editor-enter .note-editor,
+.editor-leave-active .note-editor {
+	-webkit-transform: scale(1.1);
+	transform: scale(1.1);
 }
 </style>

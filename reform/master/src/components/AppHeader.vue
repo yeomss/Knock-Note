@@ -1,13 +1,22 @@
 <template>
 	<!-- 헤더 -->
 	<div class="header">
-		<img src="../assets/logo.png" />
-		<p class="text-shadow">
-			<a href="javascript:location.reload()">Knock Note</a>
-		</p>
-		<span class="material-icons add-btn" @click.prevent="openEditor">
-			note_add
-		</span>
+		<div class="header-sub">
+			<img src="../assets/logo.png" />
+			<p class="text-shadow">
+				<a href="javascript:location.reload()">Knock Note</a>
+			</p>
+			<span
+				class="material-icons add-btn text-shadow"
+				@click.prevent="openEditor"
+			>
+				note_add
+			</span>
+		</div>
+
+		<a href="#app">
+			<span class="material-icons top-btn"> expand_less </span>
+		</a>
 	</div>
 </template>
 
@@ -25,13 +34,23 @@ export default {
 .header {
 	position: fixed;
 	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	flex-wrap: wrap;
 	align-items: center;
 	width: 100%;
 	z-index: 100; // 제일 높게
 	top: 0;
+	opacity: 0.9;
 	background: #f4cccc;
 
 	cursor: default;
+}
+.header-sub {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
 
 	a {
 		color: #fff;
@@ -39,33 +58,43 @@ export default {
 	}
 	p {
 		font-size: 35px;
-		margin: 15px 20px;
+		margin: 0.7rem 1rem;
 	}
 	img {
-		margin-left: 20px;
-		height: 50px;
+		margin-right: -0.5rem;
+		padding-bottom: 2px;
+		height: 40px;
 	}
 }
 .add-btn {
-	background-color: transparent;
+	margin-left: 0.5rem;
 	font-size: 2.5rem;
 	cursor: pointer;
-	opacity: 1;
+	opacity: 0.8;
 	transition: all 0.3s ease;
+	color: #fff;
 
 	&:hover {
-		opacity: 0.8;
+		opacity: 1;
 		transform: scale(1.1);
+		color: #654b52;
 	}
 }
-// note editor open btn
-// .add-btn {
-// 	padding: 5px 10px;
-// 	margin: 20px;
-// 	border: none;
-// 	color: #000;
-// 	outline: none;
-// 	font-size: 10px;
-// 	cursor: pointer;
-// }
+.top-btn {
+	position: fixed;
+	z-index: 10;
+	bottom: 1.2rem;
+	right: 1.2rem;
+	background-color: #654b52;
+	color: #fff;
+	border-radius: 100%;
+	font-size: 3rem;
+	opacity: 0.7;
+	transition: all 0.3s ease;
+	cursor: pointer;
+
+	&:hover {
+		opacity: 1;
+	}
+}
 </style>

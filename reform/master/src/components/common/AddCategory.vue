@@ -75,9 +75,8 @@ export default {
 	}
 
 	.btns {
-		margin-top: 0.3rem;
+		margin-top: 0.36rem;
 		cursor: pointer;
 	}
 }
-
 </style>

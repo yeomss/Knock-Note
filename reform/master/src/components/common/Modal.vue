@@ -3,8 +3,11 @@
 		<div class="modal-mask" v-if="showModal">
 			<div class="modal-wrapper">
 				<div class="modal-container">
-					<span @click="closeModal">
-						<i class="fas fa-times closeBtn"></i>
+					<span>
+						<i
+							@click="closeModal"
+							class="fas fa-times closeBtn"
+						></i>
 					</span>
 
 					<!-- modal header -->
@@ -57,7 +60,7 @@ export default {
 	width: 300px;
 	margin: 0px auto;
 	padding: 20px 30px;
-	background-color: #fff;
+	background-color: #f4cccc;
 	opacity: 0.95;
 	border-radius: 2px;
 	border: none;
@@ -89,6 +92,7 @@ export default {
 
 		li {
 			width: 100%;
+			font-size: 1rem;
 			// margin-left: 0.5rem;
 			display: flex;
 			align-items: center;
