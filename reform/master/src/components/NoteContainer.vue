@@ -44,20 +44,6 @@
 				<div class="note-date">
 					{{ note.createDate }}
 				</div>
-
-				<!-- 노트 카테고리 -->
-				<div class="note-category">
-					<!-- 노트 카테고리 설정 -->
-					<select
-						v-model="notesCategory[key]"
-						@change="setNoteCategory(key)"
-						@blur="setNoteCategory(key)"
-					>
-						<option v-for="category in categorys" :key="category">
-							{{ category }}
-						</option>
-					</select>
-				</div>
 			</div>
 
 			<!-- 노트 모달 -->
@@ -114,7 +100,7 @@
 					<div>
 						<!-- 노트 테마 -->
 						<span
-							class="material-icons"
+							class="material-icons note-btn"
 							@click="noteThemeOpen(key, note.theme)"
 						>
 							palette
@@ -125,23 +111,23 @@
 						>
 							<ul>
 								<li
-									class="theme1 shadow"
+									class="theme1 shadow note-btn"
 									@click="setTheme(key, themes[0])"
 								></li>
 								<li
-									class="theme2 shadow"
+									class="theme2 shadow note-btn"
 									@click="setTheme(key, themes[1])"
 								></li>
 								<li
-									class="theme3 shadow"
+									class="theme3 shadow note-btn"
 									@click="setTheme(key, themes[2])"
 								></li>
 								<li
-									class="theme4 shadow"
+									class="theme4 shadow note-btn"
 									@click="setTheme(key, themes[3])"
 								></li>
 								<li
-									class="theme5 shadow"
+									class="theme5 shadow note-btn"
 									@click="setTheme(key, themes[4])"
 								></li>
 							</ul>
@@ -159,42 +145,58 @@
 								accept="image/*"
 								@change="setImg($event, key)"
 							/>
-							<span class="material-icons"> image </span>
+							<span class="material-icons note-btn"> image </span>
 						</span>
-					</div>
 
-					<div>
 						<!-- 음성 인식 -->
 						<span @click="voiceNote(key)">
-							<span class="material-icons"> mic </span>
+							<span class="material-icons note-btn"> mic </span>
 						</span>
 
 						<!-- 노트 읽기 -->
 						<span @click="speakNote(note.text.text)">
-							<span class="material-icons"> volume_up </span>
+							<span class="material-icons note-btn">
+								volume_up
+							</span>
+						</span>
+
+						<!-- 이미지 객체 인식 -->
+						<span
+							class="note-detect"
+							:class="key"
+							@click="detectImg(key)"
+						>
+							<span class="material-icons note-btn">
+								auto_fix_high
+							</span>
+						</span>
+
+						<!-- 번역 -->
+						<span @click="translateNote(key)">
+							<span class="material-icons note-btn">
+								g_translate
+							</span>
+						</span>
+
+						<!-- 표정 인식 -->
+						<span @click.prevent="detectEmotion(key)">
+							<span class="material-icons note-btn"> mood </span>
 						</span>
 					</div>
 				</div>
 
-				<div class="note-btns-wrapper-2">
-					<!-- 이미지 객체 인식 -->
-					<span
-						class="note-detect"
-						:class="key"
-						@click="detectImg(key)"
+				<!-- 노트 카테고리 -->
+				<div class="note-category">
+					<!-- 노트 카테고리 설정 -->
+					<select
+						v-model="notesCategory[key]"
+						@change="setNoteCategory(key)"
+						@blur="setNoteCategory(key)"
 					>
-						<span class="material-icons"> auto_fix_high </span>
-					</span>
-
-					<!-- 번역 -->
-					<span @click="translateNote(key)">
-						<span class="material-icons"> g_translate </span>
-					</span>
-
-					<!-- 표정 인식 -->
-					<span @click.prevent="detectEmotion(key)">
-						<span class="material-icons"> mood </span>
-					</span>
+						<option v-for="category in categorys" :key="category">
+							{{ category }}
+						</option>
+					</select>
 				</div>
 			</div>
 		</div>
@@ -402,46 +404,28 @@ export default {
 			console.log("emition", key);
 
 			let url = "http://127.0.0.1:3000/face";
-			// let img_ =
-			// "/Users/yeomss/Repository/Github/Toy-Project/Open-Source-Note-App/reform/master/src/assets/smile2.jpeg";
 			let data = { fileUrl: this.notes[key].img.url };
-			// let img_ =
-			// "gs://osp20-25073.appspot.com/images/f3teg5RS6fdxeAI43bycELJ99nR2/-MwwVafyiJp-7Pg6O2La/noteImage.jpeg";
-			// let data = { fileUrl: img_ };
 
-			// let formData = new FormData();
+			axios
+				.post(url, data)
+				.then((res) => {
+					console.log(res.data);
+					// console.log("emotion:", res.data["faces"][0]);
 
-			// if (this.file) {
-			// 	console.log(this.file.length);
-			// 	for (let i = 0; i < this.file.length; i++) {
-			// 		formData.append("image", this.file[i]);
-			// 	}
-			// }
-			// formData.append("hihi", 123);
-			// console.log("hehe:", formData.get("image"));
+					let emotion = res.data["faces"][0]; // 감정 인식
+					let uid = this.user.uid; // uid
 
-			// console.log("formData:", formData);
-			// console.log(typeof formData);
+					const updates = {};
 
-			// let data = { ho: "hi" };
-			// let data = JSON.parse(JSON.stringify(formData));
-			// let data = formData;
-			// let data = localStorage.getItem(key);
-			axios.post(url, data).then((res) => {
-				console.log(res.data);
-				// console.log("emotion:", res.data["faces"][0]);
+					// 해당 데이터의 위치
+					updates["/notes/" + uid + "/" + key + "/emotion"] = emotion;
 
-				// let emotion = res.data["faces"][0]; // 감정 인식
-				// let uid = this.user.uid; // uid
-
-				// const updates = {};
-
-				// // 해당 데이터의 위치
-				// updates["/notes/" + uid + "/" + key + "/emotion"] = emotion;
-
-				// // 해당 데이터만 업데이트
-				// update(ref(this.db), updates);
-			});
+					// 해당 데이터만 업데이트
+					update(ref(this.db), updates);
+				})
+				.catch(() => {
+					alert("지금은 감정 인식 기능을 사용할 수 없습니다.");
+				});
 		},
 
 		// 노트 번역
@@ -449,20 +433,26 @@ export default {
 			let url = "http://127.0.0.1:3001/translate";
 			let data = { query: this.notes[key].text.text };
 
-			await axios.post(url, data).then((res) => {
-				// 번역 내용
-				let translated = res.data["message"]["result"].translatedText;
-				let uid = this.user.uid; // uid
+			await axios
+				.post(url, data)
+				.then((res) => {
+					// 번역 내용
+					let translated =
+						res.data["message"]["result"].translatedText;
+					let uid = this.user.uid; // uid
 
-				const updates = {};
+					const updates = {};
 
-				// 해당 데이터의 위치
-				updates["/notes/" + uid + "/" + key + "/translated"] =
-					translated;
+					// 해당 데이터의 위치
+					updates["/notes/" + uid + "/" + key + "/translated"] =
+						translated;
 
-				// 해당 데이터만 업데이트
-				update(ref(this.db), updates);
-			});
+					// 해당 데이터만 업데이트
+					update(ref(this.db), updates);
+				})
+				.catch(() => {
+					alert("지금은 번역 기능을 사용할 수 없습니다.");
+				});
 		},
 
 		// 노트 테마 모달 열기
@@ -481,12 +471,12 @@ export default {
 		// 노트 테마 설정
 		setTheme(key, theme) {
 			let uid = this.user.uid; // uid
-			let newTheme = theme;
+			let newTheme = { isOpen: false, theme: theme };
 
 			const updates = {};
 
 			// 해당 데이터의 위치
-			updates["/notes/" + uid + "/" + key + "/theme/theme"] = newTheme;
+			updates["/notes/" + uid + "/" + key + "/theme"] = newTheme;
 
 			// 해당 데이터만 업데이트
 			update(ref(this.db), updates);
@@ -729,6 +719,7 @@ export default {
 	.note-category {
 		select {
 			width: 100%;
+			border: 1px solid #654b52;
 		}
 	}
 }
@@ -768,14 +759,14 @@ export default {
 
 .note-theme-modal {
 	// background-color: #fff;
-	background-color: #654b52;
+	// background-color: #654b52;
 
 	position: absolute;
 	width: 100%;
-	top: 0;
+	bottom: 5.3rem;
 	right: 0px;
 	z-index: 1;
-	// opacity: 0.6;
+	opacity: 0.95;
 	transition: 0.2s;
 	padding: 5px;
 
@@ -801,6 +792,7 @@ export default {
 		border: #000;
 		opacity: 0.7;
 		background-color: #fff;
+		border: 1px solid #654b52;
 
 		&.theme1 {
 			background-color: #f4cccc;
@@ -864,14 +856,15 @@ export default {
 		display: flex;
 		flex-direction: row;
 		justify-content: space-between;
-		align-items: center;
+		align-items: flex-start;
 		align-content: center;
-	}
-	.note-btns-wrapper-2 {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		align-items: center;
+
+		div {
+			width: 100%;
+			display: flex;
+			justify-content: space-between;
+			align-items: flex-start;
+		}
 	}
 }
 

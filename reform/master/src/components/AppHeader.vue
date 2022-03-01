@@ -5,9 +5,9 @@
 		<p class="text-shadow">
 			<a href="javascript:location.reload()">Knock Note</a>
 		</p>
-		<button class="add-btn" @click.prevent="openEditor">
-			<i class="fas fa-plus"></i>
-		</button>
+		<span class="material-icons add-btn" @click.prevent="openEditor">
+			note_add
+		</span>
 	</div>
 </template>
 
@@ -46,4 +46,26 @@ export default {
 		height: 50px;
 	}
 }
+.add-btn {
+	background-color: transparent;
+	font-size: 2.5rem;
+	cursor: pointer;
+	opacity: 1;
+	transition: all 0.3s ease;
+
+	&:hover {
+		opacity: 0.8;
+		transform: scale(1.1);
+	}
+}
+// note editor open btn
+// .add-btn {
+// 	padding: 5px 10px;
+// 	margin: 20px;
+// 	border: none;
+// 	color: #000;
+// 	outline: none;
+// 	font-size: 10px;
+// 	cursor: pointer;
+// }
 </style>

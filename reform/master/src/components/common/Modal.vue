@@ -45,7 +45,7 @@ export default {
 	background-color: rgba(0, 0, 0, 0.5);
 	display: table;
 	transition: opacity 0.3s ease;
-	color: #fff;
+	color: #654b52;
 }
 
 .modal-wrapper {
@@ -57,10 +57,12 @@ export default {
 	width: 300px;
 	margin: 0px auto;
 	padding: 20px 30px;
-	background-color: #654b52;
-	opacity: 0.9;
+	background-color: #fff;
+	opacity: 0.95;
 	border-radius: 2px;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
+	border: none;
+	// box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
+	box-shadow: 0 2px 8px rgba(146, 107, 107, 0.4);
 	transition: all 0.3s ease;
 	font-family: "Jua", "SUIT Variable", "Apple SD Gothic", "Open Sans",
 		sans-serif;
@@ -68,7 +70,7 @@ export default {
 
 .modal-header h3 {
 	margin-top: 0;
-	color: #fff;
+	color: #654b52;
 	text-align: center;
 }
 
@@ -96,7 +98,7 @@ export default {
 .closeBtn {
 	z-index: 101;
 	margin-left: 15rem;
-	color: #eb9f9f;
+	color: #654b52;
 	cursor: pointer;
 }
 

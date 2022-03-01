@@ -54,7 +54,7 @@ export default {
 .note-modal-container {
 	padding: 20px 15px;
 	margin: 0px auto;
-	background-color: #654b52;
+	background-color: #fff;
 	border-radius: 2px;
 	box-shadow: 0 2px 8px rgba(146, 107, 107, 0.4);
 	transition: all 0.3s ease;
@@ -68,19 +68,19 @@ export default {
 
 .note-modal-header {
 	font-size: 0.9rem;
-	color: #fff;
+	color: #654b52;
 	margin: 3px;
 }
 .note-modal-body {
 	font-size: 1.3rem;
-	color: #fff;
+	color: #654b52;
 }
 
 .closeBtn {
 	position: absolute;
 	top: 2px;
 	right: 5px;
-	color: #eb9f9f;
+	color: #654b52;
 	cursor: pointer;
 }
 

@@ -53,7 +53,7 @@
 <script>
 import { initializeApp } from "firebase/app";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "firebase/auth";
-import { getDatabase, ref, onValue, remove } from "firebase/database";
+import { getDatabase, ref, onValue, remove, push } from "firebase/database";
 import { getFirestore } from "firebase/firestore";
 import { getStorage, ref as storageRef, deleteObject } from "firebase/storage";
 import "@tensorflow/tfjs";
@@ -94,7 +94,7 @@ export default {
 			// db 에서 가져온 데이터
 			notes: null, // db 에서 가져온 notes
 			categorys: null, // db 에서 가져온 categorys
-			todos: null,
+			todos: null, // db 에서 가져온 todos
 
 			// 데이터
 			editorOpen: false, // note editor toggle
@@ -103,6 +103,19 @@ export default {
 
 			// 객체 탐지
 			model: null,
+
+			// 새노트
+			noteOne: {
+				title: { isEdit: false, text: "" }, // 노트 제목
+				theme: { isOpen: false, theme: "#f4cccc" }, // 노트 테마
+				text: { isEdit: false, text: "", html: "" }, // 노트 본문
+				category: "기본", // 카테고리
+				createDate: "", // 생성일자
+				img: { isUpload: false, type: "", url: "" }, // 노트 이미지
+				detected: { isOpen: false, text: "none" }, // 노트 이미지 객체 탐지
+				translated: "", // 노트 번역
+				emotion: "", // 노트 이미지 감정 인식
+			},
 		};
 	},
 
@@ -172,6 +185,17 @@ export default {
 					this.notes = data;
 
 					// let keys = Object.keys(data);
+
+					// 만약 노트가 없다면
+					if (data == null) {
+						console.log("노트 없음");
+						// // 새 노트 & 기본 카테고리 만들기
+
+						push(
+							ref(this.db, "notes/" + this.user.uid),
+							this.noteOne
+						);
+					}
 				},
 				{ onlyOnce: true }
 			);
@@ -197,8 +221,19 @@ export default {
 
 			onValue(
 				categoryRef,
-				(data) => {
-					this.categorys = data.val();
+				(snapshot) => {
+					const data = snapshot.val();
+					this.categorys = data;
+
+					// 카테고리가 없다면
+					if (data == null) {
+						console.log("카테고리 없음");
+
+						push(
+							ref(this.db, "categorys/" + this.user.uid),
+							"기본"
+						);
+					}
 				},
 				{ onlyOnce: true }
 			);

@@ -2,72 +2,65 @@
 	<Transition name="editor">
 		<div class="note-editor-mask" v-if="editorOpen">
 			<div class="note-editor-container">
-				<div class="note-editor">
+				<div
+					class="note-editor"
+					:style="{ 'background-color': theme.theme }"
+				>
 					<!-- <div @click="uploadImg">load</div> -->
 					<div>New Knock 👋</div>
-
-					<!-- 노트 카테고리 선택 -->
-					<div>
-						<select v-model="category">
-							<option v-for="c in categorys" :key="c">
-								{{ c }}
-							</option>
-							<option>카테고리 추가</option>
-						</select>
-
-						<AddCategory
-							v-if="category == '카테고리 추가'"
-							:db="db"
-							:user="user"
-						/>
-					</div>
-
-					<!-- 노트 테마 선택-->
-					<div class="note-theme">
-						<ul>
-							<li
-								class="theme1"
-								@click="setTheme(themes[0])"
-							></li>
-							<li
-								class="theme2"
-								@click="setTheme(themes[1])"
-							></li>
-							<li
-								class="theme3"
-								@click="setTheme(themes[2])"
-							></li>
-							<li
-								class="theme4"
-								@click="setTheme(themes[3])"
-							></li>
-							<li
-								class="theme5"
-								@click="setTheme(themes[4])"
-							></li>
-						</ul>
-					</div>
 
 					<!-- 노트 제목 입력 창 -->
 					<input
 						class="title-input"
 						type="text"
 						v-model="title.text"
-						placeholder="Title"
+						placeholder="노트 제목을 입력해주세요"
 					/>
 
 					<!-- 노트 본문 입력 창 -->
 					<textarea
 						rows="10"
 						v-model="text.text"
-						placeholder="똑똑 노트 두드립시다 📝"
+						placeholder="똑똑 노트를 두드립시다 📝"
 					></textarea>
 
-					<!-- 노트 이미지 -->
-					<!-- <div class="note-img">
-						<input type="file" @change="loadImg" />
-					</div> -->
+					<!-- 노트 카테고리 선택 -->
+					<div class="note-editor-category">
+						<select v-model="category">
+							<option value="기본">기본</option>
+							<option v-for="c in categorys" :key="c">
+								{{ c }}
+							</option>
+						</select>
 
+						<AddCategory :db="db" :user="user" />
+					</div>
+
+					<!-- 노트 테마 선택-->
+					<div class="note-theme">
+						<ul>
+							<li
+								class="theme1 shadow"
+								@click="setTheme(themes[0])"
+							></li>
+							<li
+								class="theme2 shadow"
+								@click="setTheme(themes[1])"
+							></li>
+							<li
+								class="theme3 shadow"
+								@click="setTheme(themes[2])"
+							></li>
+							<li
+								class="theme4 shadow"
+								@click="setTheme(themes[3])"
+							></li>
+							<li
+								class="theme5 shadow"
+								@click="setTheme(themes[4])"
+							></li>
+						</ul>
+					</div>
 					<!-- 노트 생성 버튼-->
 					<div class="note-editor-bottom">
 						<span @click="editorClose">
@@ -149,13 +142,13 @@ export default {
 		},
 
 		// 노트 이미지 로드
-		loadImg(e) {
-			// 이미지 파일 객체
-			// onChange 랑 async 랑 뭔가 같이 있으면 오류가 난다..
-			// 그래서 따로 이미지 로드하는 함수를 따로 빼둠.
-			this.imgFile = e.target.files[0];
-			this.img = this.imgFile.name;
-		},
+		// loadImg(e) {
+		// 	// 이미지 파일 객체
+		// 	// onChange 랑 async 랑 뭔가 같이 있으면 오류가 난다..
+		// 	// 그래서 따로 이미지 로드하는 함수를 따로 빼둠.
+		// 	this.imgFile = e.target.files[0];
+		// 	this.img = this.imgFile.name;
+		// },
 
 		// 노트 삭제
 		deleteNote(index) {
@@ -204,6 +197,11 @@ export default {
 	align-items: stretch;
 	justify-content: center;
 	height: 100%;
+
+	input {
+		font-family: "Jua", "SUIT Variable", "Apple SD Gothic", "Open Sans",
+			sans-serif;
+	}
 }
 
 .note-editor {
@@ -223,6 +221,10 @@ export default {
 		padding: 10px;
 		resize: none;
 		border: none;
+		color: #654b52;
+		font-size: 1rem;
+		background-color: rgba(255, 255, 255, 0.3);
+
 		&:hover {
 			outline: 0;
 		}
@@ -231,27 +233,53 @@ export default {
 		}
 	}
 
+	select {
+		opacity: 1;
+		cursor: pointer;
+	}
+
 	i {
 		font-size: 50px;
 	}
 }
 
+.title-input {
+	font-size: 1.2rem;
+	background-color: rgba(255, 255, 255, 0.3);
+}
+
+.note-editor-category {
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+	font-size: 1.2rem;
+
+	.add-category {
+		margin-top: 0;
+		margin-left: 1rem;
+	}
+}
+
 .note-theme {
 	ul {
-		background-color: #654b52;
+		// background-color: rgba(255, 255, 255, 0.3);
 		display: flex;
 		flex-direction: row;
 		padding: 5px;
 		margin: 0;
+		border-radius: 3px;
 	}
 
 	li {
 		list-style: none;
 		padding: 25px;
 		background-color: #ffffff;
+		border: 1px solid #654b52;
 		margin: 2px;
 		transition: 0.3s;
 		opacity: 0.8;
+		cursor: pointer;
+		border-radius: 3px;
 
 		&.theme1 {
 			background-color: #f4cccc;
@@ -302,14 +330,24 @@ export default {
 }
 
 .note-editor-bottom {
-	&span {
-		widows: 100px;
-		height: 100px;
-	}
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	// font-size: 1rem;
 
-	// display: flex;
-	// flex-direction: row-reverse;
-	// align-items: flex-end;
-	// flex-wrap: wrap;
+	span {
+		cursor: pointer;
+		margin-left: 1.1rem;
+
+		i {
+			transition: all 0.3s ease;
+			font-size: 2rem;
+			opacity: 0.7;
+
+			&:hover {
+				opacity: 1;
+			}
+		}
+	}
 }
 </style>

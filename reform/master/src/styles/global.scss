@@ -21,22 +21,39 @@ body {
 	height: 100%;
 }
 
+input {
+	color: #654b52;
+}
+
 select {
 	font-family: "SUIT Variable", "Apple SD Gothic", "Open Sans", sans-serif;
-	font-weight: bold;
+	// font-weight: bold;
 	// width: 100%;
+	// font-size: 1.1rem;
 	background-color: rgba(235, 235, 235, 0.4);
 	color: #654b52;
 	outline: none;
 	border-radius: 3px;
 	transition: all 0.5s ease;
 	outline-color: #eb9f9f;
+	// border: #654b5254 1px solid;
 	// border-color: #654b52;
 	border: none;
-	border-bottom: 1px solid #654b527e;
+	opacity: 0.7;
+	// border: none;
+	border-bottom: 1px solid #654b52;
 	// box-shadow: 2px 0 4px rgba(126, 83, 83, 0.05),
 	// 	0 2px 4px rgba(126, 83, 83, 0.05), 0 2px 8px rgba(126, 83, 83, 0.05),
 	// 	0 5px 16px rgba(126, 83, 83, 0.05);
+
+	&:hover {
+		opacity: 1;
+	}
+}
+
+textarea {
+	font-family: "Jua", "SUIT Variable", "Apple SD Gothic", "Open Sans",
+		sans-serif;
 }
 
 hr {
@@ -47,7 +64,7 @@ hr {
 
 ::placeholder {
 	color: #7a6a6e;
-	font-size: 0.4rem;
+	font-size: 0.5rem;
 	text-align: center;
 }
 
@@ -80,14 +97,7 @@ hr {
 		0 16px 16px rgba(235, 159, 159, 0.05);
 }
 
-// note editor open btn
-.add-btn {
-	padding: 5px 10px;
-	margin: 20px;
-	border: none;
-	color: #000;
-	outline: none;
-	font-size: 10px;
+.note-btn {
 	cursor: pointer;
 }
 

@@ -90,6 +90,8 @@ export default {
 	select {
 		margin-right: 0.5rem;
 		background-color: rgba(255, 255, 255, 0.5);
+		opacity: 1;
+		border-bottom: 1px solid #654b527e;
 	}
 
 	.editBtn {
