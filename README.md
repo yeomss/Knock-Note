@@ -1,4 +1,4 @@
-# 🐥 Opensource-Project-Note-App
+# 👋 Knock-Note
 
 ![](./images/메인화면.png)
 
