@@ -60,12 +60,12 @@ export default {
 	width: 300px;
 	margin: 0px auto;
 	padding: 20px 30px;
-	background-color: #f4cccc;
+	background-color: #fff;
 	opacity: 0.95;
 	border-radius: 2px;
 	border: none;
-	// box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
-	box-shadow: 0 2px 8px rgba(146, 107, 107, 0.4);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
+	// box-shadow: 0 2px 8px rgba(146, 107, 107, 0.4);
 	transition: all 0.3s ease;
 	font-family: "Jua", "SUIT Variable", "Apple SD Gothic", "Open Sans",
 		sans-serif;

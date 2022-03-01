@@ -66,7 +66,7 @@ export default {
 		color: #654b52;
 		border: none;
 		opacity: 0.5;
-		border-bottom: #654b52 1px solid;
+		border: #654b52 1px solid;
 		transition: all 0.3s ease;
 		&:focus {
 			outline: none;

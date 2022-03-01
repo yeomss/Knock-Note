@@ -193,7 +193,6 @@ export default {
 					if (data == null) {
 						console.log("노트 없음");
 						// // 새 노트 & 기본 카테고리 만들기
-
 						push(
 							ref(this.db, "notes/" + this.user.uid),
 							this.noteOne
@@ -306,19 +305,21 @@ export default {
 				// 로그인 상태 변화 관찰
 				onAuthStateChanged(auth, (user) => {
 					this.user = user;
-					console.log(user.uid);
-
-					// notes 읽어오기
-					this.getNotes(db, user.uid);
-					// categorys 읽어오기
-					this.getCategorys(db, user.uid);
-					// todos 읽어오기
-					this.getTodos(db, user.uid);
 				});
 			})
 			.catch((error) => {
 				console.log(error);
 			});
+
+		// 로그인에 성공했다면
+		if (this.user !== null) {
+			// notes 읽어오기
+			this.getNotes(db, this.user.uid);
+			// categorys 읽어오기
+			this.getCategorys(db, this.user.uid);
+			// todos 읽어오기
+			this.getTodos(db, this.user.uid);
+		}
 	},
 
 	// vue watch
