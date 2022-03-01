@@ -1,0 +1,7 @@
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+	.contentsContainer .noteContainer {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		background-color: aqua;
+	}
+}

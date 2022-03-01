@@ -1,110 +1,386 @@
 <template>
 	<div id="app">
-		<img id="image" src="./assets/dog.jpg" />
-		<button @click="predict">Let's predict!</button>
-		<h1>Class: {{ predicted }}</h1>
-		<app-header
-			@openEditor="editorOpen = !editorOpen"
-		></app-header>
-		<app-note-editor
-			v-if="editorOpen"
-			@noteAdded="newNote"
+		<!-- 헤더 -->
+		<AppHeader @openEditor="editorOpen = !editorOpen" />
+
+		<!-- 노트 에디터 생성-->
+		<NoteEditor
+			:editorOpen="editorOpen"
+			:app="app"
+			:user="user"
+			:db="db"
+			:storage="storage"
+			:categorys="categorys"
 			@noteDeleted="deleteNote"
-		></app-note-editor>
-		<div class="noteContainer">
-			<div
-				v-for="(note, index) in notes"
-				:key="`note-${index}`"
-				class="note"
-				:style="{ 'background-color': note.theme }"
-			>
-				<div>
-					<span
-						class="delete"
-						@click.prevent="deleteNote(index)"
-						><i class="fas fa-times"></i
-					></span>
-					<span>{{ note.title }}</span>
-					<p class="note-text">{{ note.text }}</p>
-				</div>
-			</div>
+			@editorClose="editorClose"
+		></NoteEditor>
+
+		<!-- 노트 부가적인 서비스 -->
+		<div class="subContainer">
+			<AppCategory
+				:app="app"
+				:db="db"
+				:user="user"
+				:categorys="categorys"
+				@changeCategory="changeCategory"
+			/>
+			<AppSearch @searchNote="searchNote" />
 		</div>
+		<!-- <hr /> -->
+
+		<div class="contentsContainer" v-if="notes">
+			<!-- 노트 todoList -->
+			<TodoContainer :db="db" :user="user" :todos="todos" />
+			<hr />
+			<!-- 노트 목록 -->
+			<NoteContainer
+				:notes="notes"
+				:categorys="categorys"
+				:selectedCategory="category"
+				:searchTxt="searchTxt"
+				:user="user"
+				:db="db"
+				:storage="storage"
+				:model="model"
+				@deleteNote="deleteNote"
+			/>
+		</div>
+		<Loading v-else></Loading>
 	</div>
 </template>
 
 <script>
-	import NoteEditor from "./components/NoteEditor.vue";
-	import Header from "./components/Header.vue";
-	import * as cocoSSD from "@tensorflow-models/coco-ssd";
-	import * as tf from "@tensorflow/tfjs";
-	let model;
+import { initializeApp } from "firebase/app";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "firebase/auth";
+import { getDatabase, ref, onValue, remove, push } from "firebase/database";
+import { getFirestore } from "firebase/firestore";
+import { getStorage, ref as storageRef, deleteObject } from "firebase/storage";
+import "@tensorflow/tfjs";
+import * as cocoSSD from "@tensorflow-models/coco-ssd";
 
-	export default {
-		name: "App",
-		data: function () {
-			return {
-				editorOpen: false,
-				notes: [
-					{
-						title: "Code",
-						text: "1131111222",
-						theme: "#FF8A80",
-					},
-					{
-						title: "event",
-						text: "event",
-						theme: "#DDA0DD",
-					},
-				],
-				predicted: "",
-			};
-		},
-		computed: {},
-		methods: {
-			newNote(title, text, theme) {
-				this.notes.push({
-					title: title,
-					text: text,
-					theme: theme,
-				});
-			},
-			deleteNote(index) {
-				this.notes.splice(index, 1);
-			},
-			async predict() {
-				const img = document.getElementById("image");
-				let tmp = await model.detect(img);
-				this.predicted = tmp[0].class;
-			},
-		},
-		async mounted() {
-			if (localStorage.getItem("notes"))
-				this.notes = JSON.parse(
-					localStorage.getItem("notes")
-				);
-			model = await cocoSSD.load();
+import AppHeader from "./components/AppHeader.vue";
+import NoteEditor from "./components/NoteEditor.vue";
+import AppCategory from "./components/AppCategory.vue";
+import AppSearch from "./components/AppSearch.vue";
+import TodoContainer from "./components/TodoContainer.vue";
+import NoteContainer from "./components/NoteContainer.vue";
+import Loading from "./components/common/Loading.vue";
 
-			console.log("model loaded");
-		},
-		watch: {
-			notes: {
-				handler() {
-					var newNotes = this.notes;
-					localStorage.setItem(
-						"notes",
-						JSON.stringify(newNotes)
-					);
+export default {
+	name: "App",
+
+	// 컴포넌트
+	components: {
+		AppHeader,
+		NoteEditor,
+		AppCategory,
+		AppSearch,
+		NoteContainer,
+		TodoContainer,
+		Loading,
+	},
+
+	// 데이터
+	data: function () {
+		return {
+			// firebase 정보
+			app: null, // firebase app
+			db: null, // firebase db
+			store: null, // firebase store
+			storage: null, // firebase storage
+			user: null, // 현재 익명 사용자 정보
+
+			// db 에서 가져온 데이터
+			notes: null, // db 에서 가져온 notes
+			categorys: null, // db 에서 가져온 categorys
+			todos: null, // db 에서 가져온 todos
+
+			// 데이터
+			editorOpen: false, // note editor toggle
+			category: "", // 설정한 카테고리
+			searchTxt: "", // 검색하려는 키워드
+
+			// 객체 탐지
+			model: null,
+
+			// 새노트
+			noteOne: {
+				title: { isEdit: false, text: "" }, // 노트 제목
+				theme: { isOpen: false, theme: "#f4cccc" }, // 노트 테마
+				text: { isEdit: false, text: "", html: "" }, // 노트 본문
+				category: "기본", // 카테고리
+				createDate: "", // 생성일자
+				img: { isUpload: false, type: "", url: "" }, // 노트 이미지
+				detected: { isOpen: false, text: "none" }, // 노트 이미지 객체 탐지
+				translated: "", // 노트 번역
+				mood: "", // 노트 이미지 감정 인식
+				helps: {
+					theme: false,
+					img: false,
+					voice: false,
+					speak: false,
+					detect: false,
+					translate: false,
+					mood: false,
 				},
-				deep: true,
 			},
+		};
+	},
+
+	// 함수
+	methods: {
+		// 노트 삭제
+		deleteNote(key) {
+			// this.notes.splice(index, 1);
+
+			let uid = this.user.uid;
+			if (!confirm("노트를 삭제하시겠습니까?")) {
+				return;
+			} else {
+				// storage에서 삭제
+				if (this.notes[key].img.isUpload) {
+					// const imgType = this.notes[key].img.type;
+					let path = `images/${uid}/${key}/noteImage`;
+					const imgRef = storageRef(this.storage, path);
+
+					deleteObject(imgRef)
+						.then(() => {
+							console.log("파일 삭제 완료!");
+						})
+						.catch((error) => {
+							console.log(error);
+						});
+				}
+
+				// db에서 삭제
+				const noteRef = ref(this.db, "notes/" + uid + "/" + key);
+				remove(noteRef);
+				delete this.notes[key];
+			}
 		},
-		components: {
-			appNoteEditor: NoteEditor,
-			appHeader: Header,
+
+		// 노트 에디터 닫기
+		editorClose() {
+			this.editorOpen = false;
 		},
-	};
+
+		// 노트 키워드 검색
+		searchNote(text) {
+			this.searchTxt = text;
+			console.log(this.searchTxt);
+		},
+
+		// 노트 검색 카테고리 설정
+		changeCategory(selected) {
+			this.category = selected;
+		},
+
+		// db에서 노트 가져오기
+		getNotes(db, uid) {
+			// 노트 가져오기
+			const noteRef = ref(db, "notes/" + uid);
+
+			// 노트 화면에 반영하기
+			onValue(
+				noteRef,
+				(snapshot) => {
+					const data = snapshot.val();
+					this.notes = data;
+
+					// let keys = Object.keys(data);
+
+					// 만약 노트가 없다면
+					if (data == null) {
+						console.log("노트 없음");
+						// // 새 노트 & 기본 카테고리 만들기
+						push(
+							ref(this.db, "notes/" + this.user.uid),
+							this.noteOne
+						);
+					}
+				},
+				{ onlyOnce: true }
+			);
+
+			// 목록 수신 트리거
+			// iterator 형식으로 목록을 읽어온다.
+			// onChildAdded(noteRef, (data) => {
+			// 	console.log(data.val());
+			// 	// this.notes = data;
+			// 	// console.log(data);
+			// 	// let
+			// 	// for (var d in data.val()) {
+			// 	// 	console.log(d.text, d.title);
+			// 	// }
+			// 	// // console.log(data.val());
+			// 	// this.notes.push(data.val());
+			// });
+		},
+
+		// db에서 카테고리 가져오기
+		getCategorys(db, uid) {
+			const categoryRef = ref(db, "categorys/" + uid);
+
+			onValue(
+				categoryRef,
+				(snapshot) => {
+					const data = snapshot.val();
+					this.categorys = data;
+
+					// 카테고리가 없다면
+					if (data == null) {
+						console.log("카테고리 없음");
+
+						push(
+							ref(this.db, "categorys/" + this.user.uid),
+							"기본"
+						);
+					}
+				},
+				{ onlyOnce: true }
+			);
+		},
+
+		// db 에서 to do list 가져오기
+		getTodos(db, uid) {
+			const todoRef = ref(db, "todos/" + uid);
+
+			onValue(
+				todoRef,
+				(data) => {
+					this.todos = data.val();
+				},
+				{ onlyOnce: true }
+			);
+		},
+
+		setHrTag() {
+			let browserHeight = window.innerHeight - 200;
+			let hrTag = document.querySelector(".contentsContainer hr");
+			let hrStyle = hrTag.style;
+			hrStyle.height = browserHeight + "px";
+		},
+	},
+
+	// Vue Life cycle
+	async mounted() {
+		// 객체 탐지 모델
+		this.model = await cocoSSD.load(); // Promise 객체를 반환.
+	},
+
+	async created() {
+		// firebase
+		const firebaseConfig = {
+			apiKey: "AIzaSyB-0Q3f-GlcQcNeGVbpso4o-JAo-BcVosc",
+			authDomain: "osp20-25073.firebaseapp.com",
+			databaseURL: "https://osp20-25073.firebaseio.com",
+			projectId: "osp20-25073",
+			storageBucket: "osp20-25073.appspot.com",
+			messagingSenderId: "359171034506",
+			appId: "1:359171034506:web:d857e168477488b322cc73",
+		};
+
+		// firebase app 초기화
+		const app = initializeApp(firebaseConfig);
+		this.app = app;
+
+		// db 가져오기
+		const db = getDatabase(app);
+		this.db = db;
+
+		// store 가져오기
+		const store = getFirestore();
+		this.store = store;
+
+		// storage 가져오기
+		const storage = getStorage();
+		this.storage = storage;
+
+		// 익명 인증
+		const auth = getAuth();
+
+		// 익명 로그인
+		await signInAnonymously(auth)
+			.then(() => {
+				// 로그인 상태 변화 관찰
+				onAuthStateChanged(auth, (user) => {
+					this.user = user;
+				});
+			})
+			.catch((error) => {
+				console.log(error);
+			});
+
+		// 로그인에 성공했다면
+		if (this.user !== null) {
+			// notes 읽어오기
+			this.getNotes(db, this.user.uid);
+			// categorys 읽어오기
+			this.getCategorys(db, this.user.uid);
+			// todos 읽어오기
+			this.getTodos(db, this.user.uid);
+		}
+	},
+
+	// vue watch
+	watch: {
+		notes: function () {
+			let uid = this.user.uid;
+			if (uid) {
+				// 노트 가져오기
+				const noteRef = ref(this.db, "notes/" + this.user.uid);
+
+				// 노트 화면에 반영하기
+				onValue(
+					noteRef,
+					(snapshot) => {
+						const data = snapshot.val();
+						this.notes = data;
+					},
+					{ onlyOnce: true }
+				);
+			}
+		},
+
+		categorys: function () {
+			let uid = this.user.uid;
+			if (uid) {
+				// 노트 가져오기
+				const categoryRef = ref(this.db, "categorys/" + this.user.uid);
+
+				// 노트 화면에 반영하기
+				onValue(
+					categoryRef,
+					(snapshot) => {
+						this.categorys = snapshot.val();
+					},
+					{ onlyOnce: true }
+				);
+			}
+		},
+
+		todos: function () {
+			let uid = this.user.uid;
+			if (uid) {
+				// 노트 가져오기
+				const todoRef = ref(this.db, "todos/" + this.user.uid);
+
+				// 노트 화면에 반영하기
+				onValue(
+					todoRef,
+					(snapshot) => {
+						this.todos = snapshot.val();
+					},
+					{ onlyOnce: true }
+				);
+			}
+		},
+	},
+};
 </script>
 
 <style lang="scss">
-	@import "/styles/global.scss";
+@import "/styles/global.scss";
+@import "/styles/mobile.scss";
+@import "/styles/pad.scss";
 </style>
