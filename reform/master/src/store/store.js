@@ -83,19 +83,10 @@ export const store = new Vuex.Store({
 		getNotes(state, payload) {
 			const uid = payload.uid;
 			const ref_ = ref(state.db, `notes/${uid}`);
-			let flag = false;
 
 			onValue(ref_, (data) => {
-				if (data.size === 0) {
-					flag = true;
-				}
 				state.notes = data.val();
 			});
-
-			if (flag) {
-				// 노트가 없다면 새 노트 생성
-				push(ref_, state.note);
-			}
 		},
 		// Categorys
 		getCategorys(state) {
@@ -447,9 +438,10 @@ export const store = new Vuex.Store({
 		toggleTodo(state, payload) {
 			const uid = state.user.uid;
 			const db = state.db;
+			const completed = !state.todos[payload].completed;
 			const updates = {};
 
-			updates[`/todos/${uid}/${payload}/completed`] = true;
+			updates[`/todos/${uid}/${payload}/completed`] = completed;
 
 			update(ref(db), updates);
 		},

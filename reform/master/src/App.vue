@@ -8,7 +8,7 @@
 			<NoteEditor />
 
 			<!-- 노트 부가적인 서비스 -->
-			<div class="subContainer" v-if="this.$store.state.categorys">
+			<div class="subContainer">
 				<AppCategory
 					:categorys="this.$store.state.categorys"
 					@changeCategory="changeCategory"
@@ -17,21 +17,20 @@
 			</div>
 
 			<!-- 노트 본문 서비스 -->
-			<div class="contentsContainer" v-if="this.$store.state.notes">
+			<div class="contentsContainer">
 				<!-- 노트 todoList -->
 				<TodoContainer />
 				<hr />
 				<!-- 노트 목록 -->
 				<NoteContainer
-					v-if="this.$store.state.categorys"
+					v-if="this.$store.state.notes"
 					:categorys="this.$store.state.categorys"
 					:selectedCategory="category"
 					:searchTxt="search"
 					:model="model"
 				/>
-				<Loading v-else />
+				<div class="empty-notes" v-else>새 노트를 생성해주세요 ✨</div>
 			</div>
-			<Loading v-else />
 		</div>
 		<Loading v-else />
 	</div>
@@ -100,6 +99,7 @@ export default {
 					console.log("uid:", user.uid);
 					this.user = user;
 					this.$store.commit("setUser", user);
+					this.$store.commit("getNotes", user);
 					this.$store.commit("getNotes", user);
 					this.$store.commit("getCategorys");
 					this.$store.commit("getTodos");

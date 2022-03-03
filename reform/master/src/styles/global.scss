@@ -12,8 +12,7 @@ html {
 
 body {
 	background: rgb(241, 241, 241);
-	font-family: "Jua", "SUIT Variable", "Apple SD Gothic", "Open Sans",
-		sans-serif;
+	font-family: "Jua", "SUIT Variable", "Apple SD Gothic", "Open Sans", sans-serif;
 	font-size: 1rem;
 	color: #654b52;
 	margin: 0;
@@ -52,8 +51,7 @@ select {
 }
 
 textarea {
-	font-family: "Jua", "SUIT Variable", "Apple SD Gothic", "Open Sans",
-		sans-serif;
+	font-family: "Jua", "SUIT Variable", "Apple SD Gothic", "Open Sans", sans-serif;
 }
 
 hr {
@@ -92,9 +90,17 @@ hr {
 	// box-shadow: 5px 10px 10px rgba(0, 0, 0, 0.03);
 	// box-shadow: 5px 10px 10px rgba(235, 159, 159, 0.05);
 	// box-shadow: 5px 10px 7px rgba(235, 159, 159, 0.1);
-	box-shadow: 0 2px 2px rgba(235, 159, 159, 0.05),
-		0 4px 4px rgba(235, 159, 159, 0.05), 0 8px 8px rgba(235, 159, 159, 0.05),
-		0 16px 16px rgba(235, 159, 159, 0.05);
+	box-shadow: 0 2px 2px rgba(235, 159, 159, 0.05), 0 4px 4px rgba(235, 159, 159, 0.05),
+		0 8px 8px rgba(235, 159, 159, 0.05), 0 16px 16px rgba(235, 159, 159, 0.05);
+}
+
+.empty-notes {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding-top: 15%;
+	font-size: 1.5rem;
 }
 
 .note-btn {
