@@ -1,15 +1,10 @@
 <template>
 	<Transition name="editor">
-		<div class="note-editor-mask" v-if="editorOpen">
+		<div class="note-editor-mask" v-if="this.$store.state.editorOpen">
 			<div class="note-editor-container">
-				<div
-					class="note-editor"
-					:style="{ 'background-color': theme.theme }"
-				>
+				<div class="note-editor" :style="{ 'background-color': theme.theme }">
 					<!-- <div @click="uploadImg">load</div> -->
-					<div class="note-editor-main-title text-shadow">
-						New Knock 👋
-					</div>
+					<div class="note-editor-main-title text-shadow">New Knock 👋</div>
 
 					<!-- 노트 제목 입력 창 -->
 					<input
@@ -30,37 +25,22 @@
 					<div class="note-editor-category">
 						<select v-model="category">
 							<option value="기본">기본</option>
-							<option v-for="c in categorys" :key="c">
+							<option v-for="c in this.$store.state.categorys" :key="c">
 								{{ c }}
 							</option>
 						</select>
 
-						<AddCategory :db="db" :user="user" />
+						<AddCategory />
 					</div>
 
 					<!-- 노트 테마 선택-->
 					<div class="note-theme">
 						<ul>
-							<li
-								class="theme1 shadow"
-								@click="setTheme(themes[0])"
-							></li>
-							<li
-								class="theme2 shadow"
-								@click="setTheme(themes[1])"
-							></li>
-							<li
-								class="theme3 shadow"
-								@click="setTheme(themes[2])"
-							></li>
-							<li
-								class="theme4 shadow"
-								@click="setTheme(themes[3])"
-							></li>
-							<li
-								class="theme5 shadow"
-								@click="setTheme(themes[4])"
-							></li>
+							<li class="theme1 shadow" @click="setTheme(themes[0])"></li>
+							<li class="theme2 shadow" @click="setTheme(themes[1])"></li>
+							<li class="theme3 shadow" @click="setTheme(themes[2])"></li>
+							<li class="theme4 shadow" @click="setTheme(themes[3])"></li>
+							<li class="theme5 shadow" @click="setTheme(themes[4])"></li>
 						</ul>
 					</div>
 					<!-- 노트 생성 버튼-->
@@ -69,10 +49,7 @@
 							<i class="fa-solid fa-circle-xmark text-shadow"></i>
 						</span>
 						<span @click="createNew">
-							<i
-								class="checkBtn fa-solid fa-circle-check text-shadow"
-							>
-							</i>
+							<i class="checkBtn fa-solid fa-circle-check text-shadow"> </i>
 						</span>
 					</div>
 				</div>
@@ -82,15 +59,12 @@
 </template>
 
 <script>
-import { push, ref as dbRef } from "firebase/database";
-// import { uploadBytes, ref, getDownloadURL } from "firebase/storage";
+import { push, ref } from "firebase/database";
 import moment from "moment";
 
 import AddCategory from "./common/AddCategory.vue";
 
 export default {
-	props: ["editorOpen", "app", "db", "user", "storage", "categorys"],
-
 	components: { AddCategory },
 
 	data: function () {
@@ -100,11 +74,10 @@ export default {
 			text: { isEdit: false, text: "", html: "" }, // 노트 본문
 			category: "기본", // 카테고리
 			createDate: "", // 생성일자
-			img: { isUpload: false, type: "", url: "" }, // 노트 이미지
+			img: { isUpload: false, isDel: false, type: "", url: "" }, // 노트 이미지
 			detected: { isOpen: false, text: "none" }, // 노트 이미지 객체 탐지
 			translated: "", // 노트 번역
 			mood: "", // 노트 이미지 감정 인식
-
 			// help 모달 창 띄우기
 			helps: {
 				theme: false,
@@ -117,15 +90,14 @@ export default {
 			},
 
 			// 노트 테마 색상
-			themes: ["#F4CCCC", "#EB9F9F", "#E7D9E7", "#FFF2CC", "#F2F2F2"],
+			themes: this.$store.state.themes,
 		};
 	},
 
 	methods: {
 		// 새 노트 생성
-		async createNew() {
+		createNew() {
 			// 데이터 저장
-			let uid = this.user.uid;
 			let text = {
 				isEdit: false,
 				text: this.text.text,
@@ -147,9 +119,14 @@ export default {
 				helps: this.helps,
 			};
 
-			push(dbRef(this.db, "notes/" + uid), newNote); // db에 노트 정보 저장
+			const db = this.$store.state.db;
+			const user = this.$store.state.user;
+			const noteRef = ref(db, `notes/${user.uid}`);
+			push(noteRef, newNote);
 
-			this.$emit("editorClose");
+			this.$store.commit("getNotes", user);
+			this.$store.commit("getCategorys");
+			this.$store.commit("openEditor");
 			this.initEditor();
 		},
 
@@ -158,47 +135,26 @@ export default {
 			this.theme = { isOpen: false, theme: theme };
 		},
 
-		// 노트 이미지 로드
-		// loadImg(e) {
-		// 	// 이미지 파일 객체
-		// 	// onChange 랑 async 랑 뭔가 같이 있으면 오류가 난다..
-		// 	// 그래서 따로 이미지 로드하는 함수를 따로 빼둠.
-		// 	this.imgFile = e.target.files[0];
-		// 	this.img = this.imgFile.name;
-		// },
-
-		// 노트 삭제
-		deleteNote(index) {
-			this.$emit("noteDeleted", index);
-		},
-
 		// 노트 에디터 모달 닫기
 		editorClose() {
 			if (confirm("새 노트를 닫으시겠습니까?")) {
-				this.$emit("editorClose");
+				this.$store.commit("openEditor");
 			}
 		},
 
 		// 노트 에디터 내용 초기화
 		initEditor() {
-			this.title = { isEdit: false, text: "" };
-			this.text = { isEdit: false, text: "", html: "" };
-			this.theme = { isOpen: false, theme: "#f4cccc" };
-			this.category = "기본";
+			const note = this.$store.state.note;
+			this.title = note.title;
+			this.text = note.text;
+			this.theme = note.theme;
+			this.category = note.category;
 			this.createDate = "";
-			this.img = { isUpload: false, type: "", url: "" };
-			this.detected = { isOpen: false, text: "none" };
-			this.translated = "";
-			this.mood = "";
-			this.helps = {
-				theme: false,
-				img: false,
-				voice: false,
-				speak: false,
-				detect: false,
-				translate: false,
-				mood: false,
-			};
+			this.img = note.img;
+			this.detected = note.detected;
+			this.translated = note.translated;
+			this.mood = note.mood;
+			this.helps = note.helps;
 		},
 	},
 };
@@ -225,8 +181,7 @@ export default {
 	height: 100%;
 
 	input {
-		font-family: "Jua", "SUIT Variable", "Apple SD Gothic", "Open Sans",
-			sans-serif;
+		font-family: "Jua", "SUIT Variable", "Apple SD Gothic", "Open Sans", sans-serif;
 		margin-bottom: 1rem;
 	}
 }

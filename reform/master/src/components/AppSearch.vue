@@ -1,11 +1,6 @@
 <template>
 	<div class="searchContainer">
-		<input
-			type="text"
-			placeholder="Search"
-			v-model="searchTxt"
-			@keyup.enter="searchNote"
-		/>
+		<input type="text" placeholder="Search" v-model="text" @keypress.enter="searchNote" />
 		<span @click="searchNote">
 			<span class="material-icons searchBtn"> search </span>
 		</span>
@@ -16,13 +11,13 @@
 export default {
 	data() {
 		return {
-			searchTxt: "",
+			text: "",
 		};
 	},
 
 	methods: {
 		searchNote() {
-			this.$emit("searchNote", this.searchTxt);
+			this.$emit("searchNote", this.text);
 		},
 	},
 };

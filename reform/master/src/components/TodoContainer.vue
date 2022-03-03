@@ -7,22 +7,20 @@
 
 			<!-- toooInput -->
 			<div class="todoInputBox shadow">
-				<input type="text" v-model="text" @keyup.enter="addTodo" />
+				<input type="text" v-model="text" @keypress.enter="addTodo" />
 				<span class="todoAddBtnContainer">
-					<span class="material-icons todoAddBtn" @click="addTodo">
-						add
-					</span>
+					<span class="material-icons todoAddBtn" @click="addTodo"> add </span>
 				</span>
 			</div>
 
 			<!-- todoList -->
 			<div>
 				<transition-group name="list" tag="ul">
-					<li v-for="(todo, key) in todos" :key="key" class="shadow">
+					<li v-for="(todo, key) in this.$store.state.todos" :key="key" class="shadow">
 						<span
 							class="material-icons todoCheck"
 							:class="{ todoCheckCompleted: todo.completed }"
-							@click="toggleTodo(todo, key)"
+							@click="toggleTodo(key)"
 						>
 							check
 						</span>
@@ -30,15 +28,13 @@
 						<span
 							class="todoText"
 							:class="{ textCompleted: todo.completed }"
-							@click="toggleTodo(todo, key)"
+							@click="toggleTodo(key)"
 						>
 							{{ todo.text }}
 						</span>
 
 						<span @click="deleteTodo(key)">
-							<span class="material-icons todoDelete">
-								delete
-							</span>
+							<span class="material-icons todoDelete"> delete </span>
 						</span>
 					</li>
 				</transition-group>
@@ -48,11 +44,7 @@
 </template>
 
 <script>
-import { push, ref, remove, set } from "firebase/database";
-
 export default {
-	props: ["db", "user", "todos"],
-
 	data() {
 		return {
 			text: "",
@@ -62,32 +54,21 @@ export default {
 	methods: {
 		// todo 추가
 		addTodo() {
-			let newTodo = {
-				completed: false,
-				text: this.text,
-			};
-
-			// 데이터 저장
-			if (this.text !== "") {
-				let uid = this.user.uid;
-				push(ref(this.db, "todos/" + uid), newTodo);
-			}
+			this.$store.commit("addTodo", this.text);
+			this.$store.commit("getTodos");
 			this.text = "";
 		},
 
 		// todo 삭제
 		deleteTodo(key) {
-			let uid = this.user.uid;
-			remove(ref(this.db, "todos/" + uid + "/" + key));
-			delete this.todos[key];
+			this.$store.commit("deleteTodo", key);
+			this.$store.commit("getTodos");
 		},
 
 		// todo 체크
-		toggleTodo(todo, key) {
-			let uid = this.user.uid;
-			let todoRef = ref(this.db, "todos/" + uid + "/" + key);
-			let updateTodo = { completed: !todo.completed, text: todo.text };
-			set(todoRef, updateTodo);
+		toggleTodo(key) {
+			this.$store.commit("toggleTodo", key);
+			this.$store.commit("getTodos");
 		},
 	},
 };

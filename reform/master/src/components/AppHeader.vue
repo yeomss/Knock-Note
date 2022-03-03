@@ -6,10 +6,7 @@
 			<p class="text-shadow">
 				<a href="javascript:location.reload()">Knock Note</a>
 			</p>
-			<span
-				class="material-icons add-btn text-shadow"
-				@click.prevent="openEditor"
-			>
+			<span class="material-icons add-btn text-shadow" @click.prevent="openEditor">
 				note_add
 			</span>
 		</div>
@@ -23,8 +20,8 @@
 <script>
 export default {
 	methods: {
-		openEditor: function () {
-			this.$emit("openEditor");
+		openEditor() {
+			this.$store.commit("openEditor");
 		},
 	},
 };

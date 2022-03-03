@@ -1,23 +1,20 @@
 <template>
 	<div class="categoryContainer">
 		<!-- 선택 박스 -->
-		<select v-model="selectedCategory" @change="changeCategory">
+		<select v-model="selected" @change="changeCategory">
 			<option value="">전체</option>
-			<option v-for="category in categorys" :key="category">
+			<option v-for="category in this.$store.state.categorys" :key="category">
 				{{ category }}
 			</option>
 		</select>
 
 		<!-- 카테고리 수정 버튼 -->
-		<span class="editBtn" @click="categoryModalOpen = true">
+		<span class="editBtn" @click="showModal = true">
 			<span class="material-icons"> edit_note </span>
 		</span>
 
 		<!-- 버튼 누르면 뜨는 카테고리 수정 창-->
-		<CategoryModal
-			:showModal="categoryModalOpen"
-			@closeModal="categoryModalOpen = false"
-		>
+		<CategoryModal :showModal="showModal" @closeModal="showModal = false">
 			<template #header>
 				<h3>Category</h3>
 			</template>
@@ -26,56 +23,51 @@
 				<ul v-for="(category, key) in categorys" :key="key">
 					<li>
 						{{ category }}
-						<span
-							class="material-icons deleteBtn"
-							@click="deleteCategory(key)"
-						>
+						<span class="material-icons deleteBtn" @click="deleteCategory(key)">
 							backspace
 						</span>
 					</li>
 				</ul>
 
-				<AddCategory
-					:db="db"
-					:user="user"
-					:categorys="categorys"
-				></AddCategory>
+				<AddCategory />
 			</template>
 		</CategoryModal>
 	</div>
 </template>
 
 <script>
-import { ref, remove } from "firebase/database";
 import CategoryModal from "./common/Modal.vue";
 import AddCategory from "./common/AddCategory.vue";
 
 export default {
-	props: ["app", "db", "user", "categorys"],
-
 	components: { CategoryModal, AddCategory },
 
 	data() {
 		return {
-			selectedCategory: "",
-			categoryModalOpen: false,
+			categorys: null,
+			selected: "",
+			showModal: false,
 		};
 	},
 
 	methods: {
 		// 필터링 카테고리 변경
 		changeCategory() {
-			this.$emit("changeCategory", this.selectedCategory);
+			this.$emit("changeCategory", this.selected);
+			this.$store.commit("getCategorys");
 		},
 
 		// 카테고리 설정란에서 카테고리 삭제
 		deleteCategory(key) {
-			let uid = this.user.uid;
-
-			// db에서 삭제
-			const noteRef = ref(this.db, "categorys/" + uid + "/" + key);
-			remove(noteRef);
+			this.$store.commit("deleteCategory", key);
+			this.$store.commit("getCategorys");
 		},
+	},
+
+	created() {
+		this.$store.commit("getCategorys");
+		const categorys = this.$store.state.categorys;
+		console.log(categorys);
 	},
 };
 </script>

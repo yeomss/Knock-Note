@@ -6,6 +6,7 @@
 					<span @click="closeModal">
 						<i class="fas fa-times closeBtn"></i>
 					</span>
+
 					<!-- modal header -->
 					<div class="note-modal-header">
 						<slot name="header"> default header </slot>

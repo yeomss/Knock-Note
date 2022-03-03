@@ -4,7 +4,7 @@
 			type="text"
 			v-model="newCategory"
 			placeholder="New Category"
-			@keyup.enter="addCategory"
+			@keypress.enter="addCategory"
 		/>
 
 		<div class="btns">
@@ -14,11 +14,7 @@
 </template>
 
 <script>
-import { push, ref } from "firebase/database";
-
 export default {
-	props: ["db", "user", "categorys"],
-
 	data() {
 		return {
 			newCategory: "",
@@ -27,25 +23,8 @@ export default {
 
 	methods: {
 		addCategory() {
-			// 중복 처리
-			let uid = this.user.uid;
-			let flag = false; // 중복된 카테고리가 없을 시
-
-			if (this.newCategory != "") {
-				for (let i in this.categorys) {
-					if (this.categorys[i] === this.newCategory) {
-						alert("중복된 카테고리가 있습니다.");
-						flag = true;
-						break;
-					}
-				}
-
-				if (!flag) {
-					// 카테고리 저장
-					push(ref(this.db, "categorys/" + uid), this.newCategory);
-				}
-			}
-
+			this.$store.commit("addCategory", this.newCategory);
+			this.$store.commit("getCategorys");
 			this.newCategory = "";
 		},
 	},
