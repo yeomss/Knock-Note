@@ -24,7 +24,12 @@
 						@click="openEditTitle(key)"
 					>
 					</textarea>
-					<textarea v-else rows="1" placeholder="Knock Note 👋"></textarea>
+					<textarea
+						@click="openEditTitle(key)"
+						v-else
+						rows="1"
+						placeholder="Knock Note 👋"
+					></textarea>
 				</div>
 				<textarea
 					id="note-title-area"
@@ -268,11 +273,12 @@ export default {
 			const db = this.$store.state.db;
 			const notes = this.$store.state.notes;
 
+			const isEdit = !notes[key].title.isEdit;
 			// title 에 수정 전의 텍스트가 뜨도록
 			this.editTitle = notes[key].title.text;
 
 			const updates = {};
-			updates["/notes/" + uid + "/" + key + "/title/isEdit"] = true;
+			updates["/notes/" + uid + "/" + key + "/title/isEdit"] = isEdit;
 			update(ref(db), updates);
 
 			// textarea 에 포커싱
@@ -649,11 +655,13 @@ export default {
 }
 .note-title-wrapper {
 	font-size: 1.15rem;
+	border: none;
 	cursor: pointer;
 
 	textarea {
+		display: block;
 		font-size: 1.15rem;
-		border: none;
+		margin: 0;
 	}
 }
 .note-meta-wrapper {

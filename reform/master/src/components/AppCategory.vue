@@ -3,7 +3,7 @@
 		<!-- 선택 박스 -->
 		<select v-model="selected" @change="changeCategory">
 			<option value="">전체</option>
-			<option v-for="category in this.$store.state.categorys" :key="category">
+			<option v-for="category in categorys" :key="category">
 				{{ category }}
 			</option>
 		</select>
@@ -21,7 +21,8 @@
 
 			<template #body>
 				<ul v-for="(category, key) in categorys" :key="key">
-					<li>
+					<li v-if="category === '기본'">{{ category }}</li>
+					<li v-else>
 						{{ category }}
 						<span class="material-icons deleteBtn" @click="deleteCategory(key)">
 							backspace
@@ -40,11 +41,11 @@ import CategoryModal from "./common/Modal.vue";
 import AddCategory from "./common/AddCategory.vue";
 
 export default {
+	props: ["categorys"],
 	components: { CategoryModal, AddCategory },
 
 	data() {
 		return {
-			categorys: null,
 			selected: "",
 			showModal: false,
 		};
@@ -66,8 +67,6 @@ export default {
 
 	created() {
 		this.$store.commit("getCategorys");
-		const categorys = this.$store.state.categorys;
-		console.log(categorys);
 	},
 };
 </script>

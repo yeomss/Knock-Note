@@ -8,8 +8,11 @@
 			<NoteEditor />
 
 			<!-- 노트 부가적인 서비스 -->
-			<div class="subContainer">
-				<AppCategory @changeCategory="changeCategory" />
+			<div class="subContainer" v-if="this.$store.state.categorys">
+				<AppCategory
+					:categorys="this.$store.state.categorys"
+					@changeCategory="changeCategory"
+				/>
 				<AppSearch @searchNote="searchNote" />
 			</div>
 

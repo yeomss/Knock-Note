@@ -83,29 +83,37 @@ export const store = new Vuex.Store({
 		getNotes(state, payload) {
 			const uid = payload.uid;
 			const ref_ = ref(state.db, `notes/${uid}`);
+			let flag = false;
 
 			onValue(ref_, (data) => {
-				if (data.size == 0) {
-					// 노트가 없다면 새 노트 생성
-					push(ref_, state.note);
-				} else {
-					state.notes = data.val();
+				if (data.size === 0) {
+					flag = true;
 				}
+				state.notes = data.val();
 			});
+
+			if (flag) {
+				// 노트가 없다면 새 노트 생성
+				push(ref_, state.note);
+			}
 		},
 		// Categorys
 		getCategorys(state) {
 			const db = state.db;
 			const uid = state.user.uid;
 			const ref_ = ref(db, `categorys/${uid}`);
+			let flag = false;
 
 			onValue(ref_, (data) => {
 				if (data.size == 0) {
-					push(ref_, "기본");
-				} else {
-					state.categorys = data.val();
+					flag = true;
 				}
+				state.categorys = data.val();
 			});
+
+			if (flag) {
+				push(ref_, "기본");
+			}
 		},
 		// Todos
 		getTodos(state) {
